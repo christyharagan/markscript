@@ -1,0 +1,9 @@
+{
+  "name": "markscript-typescript-example",
+  "version": "0.1.0",
+  "description": "An example project written in TypeScript demonstrating how to use MarkScript",
+  "license": "MIT",
+  "dependencies": {
+    "speckle": "^0.2.0"
+  }
+}

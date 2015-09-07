@@ -1,0 +1,50 @@
+{
+    "compilerOptions": {
+        "emitDecoratorMetadata": false,
+        "declaration": false,
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "noLib": false,
+        "rootDir": ".",
+        "sourceMap": true,
+        "sourceRoot": ".",
+        "target": "es5",
+        "outDir": "./dist"
+    },
+    "formatCodeOptions": {
+        "indentSize": 2,
+        "tabSize": 2
+    },
+    "filesGlob": [
+        "./lib/**/*.ts",
+        "./node_modules/speckle/speckle.d.ts",
+        "../../node_modules/ml-typescript-definitions/*.d.ts",
+        "../../typings/**/*.d.ts",
+        "../../node_modules/*/*.d.ts",
+        "../../node_modules/typescript/bin/typescript.d.ts"
+    ],
+    "files": [
+        "./lib/sampleAlert.ts",
+        "./lib/sampleDatabaseModel.ts",
+        "./lib/sampleExtension.ts",
+        "./lib/sampleModule.ts",
+        "./lib/sampleRuleSet.ts",
+        "./lib/sampleTask.ts",
+        "./node_modules/speckle/speckle.d.ts",
+        "../../node_modules/ml-typescript-definitions/client.d.ts",
+        "../../node_modules/ml-typescript-definitions/server.d.ts",
+        "../../typings/es6/es6.d.ts",
+        "../../typings/glob/glob.d.ts",
+        "../../typings/minimatch/minimatch.d.ts",
+        "../../typings/mocha/mocha.d.ts",
+        "../../typings/node/node.d.ts",
+        "../../typings/should-promised/should-promised.d.ts",
+        "../../typings/should/should.d.ts",
+        "../../typings/tsd.d.ts",
+        "../../node_modules/ml-admin/ml-admin.d.ts",
+        "../../node_modules/speckle/speckle.d.ts",
+        "../../node_modules/typescript-package/typescript-package.d.ts",
+        "../../node_modules/typescript-schema/typescript-schema.d.ts",
+        "../../node_modules/typescript/bin/typescript.d.ts"
+    ]
+}
