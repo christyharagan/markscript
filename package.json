@@ -1,6 +1,6 @@
 {
   "name": "markscript-core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A library for building JavaScript or TypeScript projects with MarkLogic.",
   "main": "dist/lib/index.js",
   "repository": "christyharagan/markscript",

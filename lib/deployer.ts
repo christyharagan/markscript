@@ -326,30 +326,41 @@ export function deployAssets(adminClient: Client, configClient: Client, createCl
       code: speckleCode
     }
   }
+  let promise: Promise<boolean>
   if (assetModel.modules) {
+    let modulePromises: Promise<boolean>[] = []
     let modulesClient = createClient(model.modulesDatabase)
     Object.keys(assetModel.modules).forEach(function(name) {
-      promises.push(deployer.deployModule(modulesClient, assetModel.modules[name]))
+      modulePromises.push(deployer.deployModule(modulesClient, assetModel.modules[name]))
     })
-  }
-  if (assetModel.extensions) {
-    let modulesClient = createClient(model.modulesDatabase)
-    Object.keys(assetModel.extensions).forEach(function(name) {
-      promises.push(deployer.deployExtension(modulesClient, assetModel.extensions[name]))
-    })
-  }
-  if (assetModel.tasks) {
-    Object.keys(assetModel.tasks).forEach(function(name) {
-      promises.push(deployer.deployTask(configClient, assetModel.tasks[name], model))
-    })
-  }
-  if (assetModel.alerts) {
-    Object.keys(assetModel.alerts).forEach(function(name) {
-      promises.push(deployer.deployAlert(createClient(model.contentDatabase), assetModel.alerts[name]))
-    })
+    promise = toPromise(modulePromises)
+  } else {
+    promise = Promise.resolve(true)
   }
 
-  return toPromise(promises)
+  return promise.then(function(result) {
+    if (result) {
+      if (assetModel.extensions) {
+        let modulesClient = createClient(model.modulesDatabase)
+        Object.keys(assetModel.extensions).forEach(function(name) {
+          promises.push(deployer.deployExtension(modulesClient, assetModel.extensions[name]))
+        })
+      }
+      if (assetModel.tasks) {
+        Object.keys(assetModel.tasks).forEach(function(name) {
+          promises.push(deployer.deployTask(configClient, assetModel.tasks[name], model))
+        })
+      }
+      if (assetModel.alerts) {
+        Object.keys(assetModel.alerts).forEach(function(name) {
+          promises.push(deployer.deployAlert(createClient(model.contentDatabase), assetModel.alerts[name]))
+        })
+      }
+      return toPromise(promises)
+    } else {
+      return false
+    }
+  })
 }
 
 export function undeployAssets(client: Client, deployer: Deployer, model: m.Model): Promise<boolean> {
