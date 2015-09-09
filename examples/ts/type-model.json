@@ -1,0 +1,2258 @@
+{
+  "markscript-typescript-example/lib/sampleDatabaseModel": {
+    "classConstructors": {
+      "TypeScriptExample": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "name": {
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              },
+              "decorators": []
+            },
+            "host": {
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              },
+              "decorators": []
+            },
+            "port": {
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 3
+              },
+              "decorators": []
+            },
+            "server": {
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "ServerSpec"
+              },
+              "decorators": []
+            },
+            "contentDatabase": {
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "DatabaseSpec"
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "contentDatabase"
+                  },
+                  "parameters": []
+                }
+              ]
+            },
+            "triggersDatabase": {
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "DatabaseSpec"
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "triggersDatabase"
+                  },
+                  "parameters": []
+                }
+              ]
+            },
+            "modulesDatabase": {
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "DatabaseSpec"
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "modulesDatabase"
+                  },
+                  "parameters": []
+                }
+              ]
+            },
+            "schemaDatabase": {
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "DatabaseSpec"
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "schemaDatabase"
+                  },
+                  "parameters": []
+                }
+              ]
+            },
+            "customerRuleSet": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 1
+                }
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "mlRuleSet"
+                  },
+                  "parameters": [
+                    {
+                      "expressionKind": 5,
+                      "properties": {
+                        "path": {
+                          "expressionKind": 1,
+                          "value": "/rules/twitter.rules"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "staticType": {
+          "typeKind": "COMPOSITE",
+          "members": {},
+          "calls": [
+            {
+              "typeKind": "FUNCTION",
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 1
+                  },
+                  "decorators": []
+                },
+                {
+                  "name": "host",
+                  "type": {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 1
+                  },
+                  "decorators": []
+                },
+                {
+                  "name": "port",
+                  "type": {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 3
+                  },
+                  "decorators": []
+                }
+              ]
+            }
+          ]
+        },
+        "decorators": [
+          {
+            "decoratorType": {
+              "module": "markscript-core/lib/decorators",
+              "name": "mlDeploy"
+            },
+            "parameters": []
+          }
+        ]
+      }
+    },
+    "interfaceConstructors": {},
+    "types": {},
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-core/lib/model": {
+    "classConstructors": {},
+    "interfaceConstructors": {
+      "ServerSpec": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "name": {
+              "optional": false,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "contentDatabase": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "modulesDatabase": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "host": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "port": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 3
+              }
+            },
+            "group": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            }
+          }
+        }
+      },
+      "DatabaseSpec": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "name": {
+              "optional": false,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "triggersDatabase": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "securityDatabase": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "schemaDatabase": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "rangeIndices": {
+              "optional": true,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            },
+            "geoIndices": {
+              "optional": true,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            },
+            "forests": {
+              "optional": true,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            },
+            "triples": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 2
+              }
+            },
+            "defaultRulesets": {
+              "optional": true,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            }
+          }
+        }
+      }
+    },
+    "types": {
+      "TRIGGER_COMMIT": {
+        "typeKind": "ENUM",
+        "members": [
+          {
+            "name": "PRE"
+          },
+          {
+            "name": "POST"
+          }
+        ]
+      },
+      "FrequencyType": {
+        "typeKind": "ENUM",
+        "members": [
+          {
+            "name": "MINUTES"
+          },
+          {
+            "name": "HOURS"
+          },
+          {
+            "name": "DAYS"
+          }
+        ]
+      }
+    },
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  },
+  "": {
+    "classConstructors": {},
+    "interfaceConstructors": {
+      "Array": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "length": {
+              "optional": false,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 3
+              }
+            },
+            "toString": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 1
+                }
+              }
+            },
+            "toLocaleString": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 1
+                }
+              }
+            },
+            "push": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "items",
+                    "type": {
+                      "reference": {
+                        "module": "",
+                        "name": "Array"
+                      },
+                      "typeArguments": [
+                        {
+                          "module": "@",
+                          "name": "T"
+                        }
+                      ]
+                    },
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 3
+                }
+              }
+            },
+            "pop": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [],
+                "type": {
+                  "module": "@",
+                  "name": "T"
+                }
+              }
+            },
+            "concat": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "items",
+                    "type": {
+                      "module": "",
+                      "name": "Array"
+                    },
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "reference": {
+                    "module": "",
+                    "name": "Array"
+                  },
+                  "typeArguments": [
+                    {
+                      "module": "@",
+                      "name": "T"
+                    }
+                  ]
+                },
+                "typeParameters": [
+                  {
+                    "name": "U"
+                  }
+                ]
+              }
+            },
+            "join": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "separator",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 1
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 1
+                }
+              }
+            },
+            "reverse": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [],
+                "type": {
+                  "reference": {
+                    "module": "",
+                    "name": "Array"
+                  },
+                  "typeArguments": [
+                    {
+                      "module": "@",
+                      "name": "T"
+                    }
+                  ]
+                }
+              }
+            },
+            "shift": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [],
+                "type": {
+                  "module": "@",
+                  "name": "T"
+                }
+              }
+            },
+            "slice": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "start",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 3
+                    },
+                    "optional": true,
+                    "decorators": []
+                  },
+                  {
+                    "name": "end",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 3
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "reference": {
+                    "module": "",
+                    "name": "Array"
+                  },
+                  "typeArguments": [
+                    {
+                      "module": "@",
+                      "name": "T"
+                    }
+                  ]
+                }
+              }
+            },
+            "sort": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "compareFn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "a",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "b",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "typeKind": "PRIMITIVE",
+                        "primitiveTypeKind": 3
+                      }
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "reference": {
+                    "module": "",
+                    "name": "Array"
+                  },
+                  "typeArguments": [
+                    {
+                      "module": "@",
+                      "name": "T"
+                    }
+                  ]
+                }
+              }
+            },
+            "splice": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "start",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 3
+                    },
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "reference": {
+                    "module": "",
+                    "name": "Array"
+                  },
+                  "typeArguments": [
+                    {
+                      "module": "@",
+                      "name": "T"
+                    }
+                  ]
+                }
+              }
+            },
+            "unshift": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "items",
+                    "type": {
+                      "reference": {
+                        "module": "",
+                        "name": "Array"
+                      },
+                      "typeArguments": [
+                        {
+                          "module": "@",
+                          "name": "T"
+                        }
+                      ]
+                    },
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 3
+                }
+              }
+            },
+            "indexOf": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "searchElement",
+                    "type": {
+                      "module": "@",
+                      "name": "T"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "fromIndex",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 3
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 3
+                }
+              }
+            },
+            "lastIndexOf": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "searchElement",
+                    "type": {
+                      "module": "@",
+                      "name": "T"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "fromIndex",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 3
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 3
+                }
+              }
+            },
+            "every": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "value",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "index",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "typeKind": "PRIMITIVE",
+                        "primitiveTypeKind": 2
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "thisArg",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 2
+                }
+              }
+            },
+            "some": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "value",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "index",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "typeKind": "PRIMITIVE",
+                        "primitiveTypeKind": 2
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "thisArg",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "typeKind": "PRIMITIVE",
+                  "primitiveTypeKind": 2
+                }
+              }
+            },
+            "forEach": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "value",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "index",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ]
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "thisArg",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ]
+              }
+            },
+            "map": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "value",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "index",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "module": "@",
+                        "name": "U"
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "thisArg",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "module": "",
+                  "name": "Array"
+                },
+                "typeParameters": [
+                  {
+                    "name": "U"
+                  }
+                ]
+              }
+            },
+            "filter": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "value",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "index",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "typeKind": "PRIMITIVE",
+                        "primitiveTypeKind": 2
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "thisArg",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "reference": {
+                    "module": "",
+                    "name": "Array"
+                  },
+                  "typeArguments": [
+                    {
+                      "module": "@",
+                      "name": "T"
+                    }
+                  ]
+                }
+              }
+            },
+            "reduce": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "previousValue",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "currentValue",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "currentIndex",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "module": "@",
+                        "name": "T"
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "initialValue",
+                    "type": {
+                      "module": "@",
+                      "name": "T"
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "module": "@",
+                  "name": "T"
+                }
+              }
+            },
+            "reduceRight": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "callbackfn",
+                    "type": {
+                      "typeKind": "FUNCTION",
+                      "parameters": [
+                        {
+                          "name": "previousValue",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "currentValue",
+                          "type": {
+                            "module": "@",
+                            "name": "T"
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "currentIndex",
+                          "type": {
+                            "typeKind": "PRIMITIVE",
+                            "primitiveTypeKind": 3
+                          },
+                          "decorators": []
+                        },
+                        {
+                          "name": "array",
+                          "type": {
+                            "reference": {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            "typeArguments": [
+                              {
+                                "module": "@",
+                                "name": "T"
+                              }
+                            ]
+                          },
+                          "decorators": []
+                        }
+                      ],
+                      "type": {
+                        "module": "@",
+                        "name": "T"
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "initialValue",
+                    "type": {
+                      "module": "@",
+                      "name": "T"
+                    },
+                    "optional": true,
+                    "decorators": []
+                  }
+                ],
+                "type": {
+                  "module": "@",
+                  "name": "T"
+                }
+              }
+            }
+          },
+          "index": {
+            "keyType": {
+              "typeKind": "PRIMITIVE",
+              "primitiveTypeKind": 3
+            },
+            "valueType": {
+              "module": "@",
+              "name": "T"
+            }
+          }
+        },
+        "typeParameters": [
+          {
+            "name": "T"
+          }
+        ]
+      }
+    },
+    "types": {},
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-core/lib/decorators": {
+    "classConstructors": {},
+    "interfaceConstructors": {
+      "RuleSetOptions": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "path": {
+              "optional": false,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            }
+          }
+        }
+      },
+      "AlertOptions": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "name": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "scope": {
+              "optional": false,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "states": {
+              "optional": true,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            },
+            "depth": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 3
+              }
+            },
+            "commit": {
+              "optional": true,
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "TRIGGER_COMMIT"
+              }
+            }
+          }
+        }
+      },
+      "TaskOptions": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "type": {
+              "optional": false,
+              "type": {
+                "module": "markscript-core/lib/model",
+                "name": "FrequencyType"
+              }
+            },
+            "frequency": {
+              "optional": false,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 3
+              }
+            },
+            "user": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            },
+            "name": {
+              "optional": true,
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "types": {},
+    "statics": {
+      "contentDatabase": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": []
+        }
+      },
+      "triggersDatabase": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": []
+        }
+      },
+      "modulesDatabase": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": []
+        }
+      },
+      "schemaDatabase": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": []
+        }
+      },
+      "mlRuleSet": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": [
+            {
+              "name": "definition",
+              "type": {
+                "module": "markscript-core/lib/decorators",
+                "name": "RuleSetOptions"
+              },
+              "decorators": []
+            }
+          ]
+        }
+      },
+      "mlDeploy": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": []
+        }
+      },
+      "mlAlert": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": [
+            {
+              "name": "definition",
+              "type": {
+                "module": "markscript-core/lib/decorators",
+                "name": "AlertOptions"
+              },
+              "optional": true,
+              "decorators": []
+            }
+          ]
+        }
+      },
+      "mlExtension": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": []
+        }
+      },
+      "mlTask": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": [
+            {
+              "name": "definition",
+              "type": {
+                "module": "markscript-core/lib/decorators",
+                "name": "TaskOptions"
+              },
+              "optional": true,
+              "decorators": []
+            }
+          ]
+        }
+      }
+    },
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-typescript-example/markscriptfile": {
+    "classConstructors": {},
+    "interfaceConstructors": {},
+    "types": {},
+    "statics": {
+      "COMMON": {
+        "valueKind": 3,
+        "type": {
+          "modelKind": 4,
+          "primitiveTypeKind": 5,
+          "typeKind": "PRIMITIVE"
+        },
+        "initialiser": {
+          "expressionKind": 5,
+          "properties": {
+            "appName": {
+              "expressionKind": 1,
+              "value": "markscript-ts-examples"
+            },
+            "ml": {
+              "expressionKind": 5,
+              "properties": {
+                "port": {
+                  "expressionKind": 2,
+                  "value": 8005
+                },
+                "host": {
+                  "expressionKind": 1,
+                  "value": "christys-macbook-pro.local"
+                },
+                "user": {
+                  "expressionKind": 1,
+                  "value": "admin"
+                },
+                "password": {
+                  "expressionKind": 1,
+                  "value": "passw0rd"
+                }
+              }
+            }
+          }
+        }
+      },
+      "buildOptions": {
+        "valueKind": 3,
+        "type": {
+          "typeKind": "PRIMITIVE",
+          "primitiveTypeKind": 5
+        },
+        "initialiser": {
+          "expressionKind": 5,
+          "properties": {
+            "database": {
+              "expressionKind": 5,
+              "properties": {
+                "host": {
+                  "expressionKind": 7,
+                  "type": {
+                    "module": "markscript-typescript-example/markscriptfile",
+                    "name": "host"
+                  }
+                },
+                "httpPort": {
+                  "expressionKind": 7,
+                  "type": {
+                    "module": "markscript-typescript-example/markscriptfile",
+                    "name": "port"
+                  }
+                },
+                "adminPort": {
+                  "expressionKind": 2,
+                  "value": 8001
+                },
+                "configPort": {
+                  "expressionKind": 2,
+                  "value": 8002
+                },
+                "user": {
+                  "expressionKind": 7,
+                  "type": {
+                    "module": "markscript-typescript-example/markscriptfile",
+                    "name": "user"
+                  }
+                },
+                "password": {
+                  "expressionKind": 7,
+                  "type": {
+                    "module": "markscript-typescript-example/markscriptfile",
+                    "name": "password"
+                  }
+                },
+                "modelObject": {
+                  "expressionKind": 7,
+                  "type": {
+                    "module": "markscript-typescript-example/lib/sampleDatabaseModel",
+                    "name": "TypeScriptExample"
+                  }
+                },
+                "modules": {
+                  "expressionKind": 1,
+                  "value": "./lib/**/*.ts"
+                }
+              }
+            },
+            "middle": {
+              "expressionKind": 5,
+              "properties": {
+                "host": {
+                  "expressionKind": 1,
+                  "value": "localhost"
+                },
+                "port": {
+                  "expressionKind": 2,
+                  "value": 8080
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-typescript-example/lib/sampleAlert": {
+    "classConstructors": {
+      "SampleAlert": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "alert": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "uri",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 1
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "content",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "decorators": []
+                  }
+                ]
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "mlAlert"
+                  },
+                  "parameters": [
+                    {
+                      "expressionKind": 5,
+                      "properties": {
+                        "scope": {
+                          "expressionKind": 1,
+                          "value": "/sampleDir"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "staticType": {
+          "typeKind": "COMPOSITE",
+          "members": {},
+          "calls": []
+        },
+        "decorators": []
+      }
+    },
+    "interfaceConstructors": {},
+    "types": {},
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-typescript-example/lib/sampleModule": {
+    "classConstructors": {},
+    "interfaceConstructors": {},
+    "types": {},
+    "statics": {
+      "sayHello": {
+        "valueKind": 4,
+        "type": {
+          "typeKind": "FUNCTION",
+          "parameters": [
+            {
+              "name": "to",
+              "type": {
+                "typeKind": "PRIMITIVE",
+                "primitiveTypeKind": 1
+              },
+              "decorators": []
+            }
+          ]
+        }
+      }
+    },
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-typescript-example/lib/sampleExtension": {
+    "classConstructors": {
+      "SampleExtension": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "get": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  }
+                ]
+              },
+              "decorators": []
+            },
+            "post": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "input",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "decorators": []
+                  }
+                ]
+              },
+              "decorators": []
+            },
+            "put": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "input",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "decorators": []
+                  }
+                ]
+              },
+              "decorators": []
+            },
+            "delete": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  }
+                ]
+              },
+              "decorators": []
+            }
+          }
+        },
+        "staticType": {
+          "typeKind": "COMPOSITE",
+          "members": {},
+          "calls": []
+        },
+        "decorators": [
+          {
+            "decoratorType": {
+              "module": "markscript-core/lib/decorators",
+              "name": "mlExtension"
+            },
+            "parameters": []
+          }
+        ],
+        "implements": [
+          {
+            "module": "markscript-core/lib/server/extension",
+            "name": "Extension"
+          }
+        ]
+      }
+    },
+    "interfaceConstructors": {},
+    "types": {},
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-core/lib/server/extension": {
+    "classConstructors": {},
+    "interfaceConstructors": {
+      "Context": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "inputTypes": {
+              "optional": false,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            },
+            "acceptTypes": {
+              "optional": false,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            },
+            "outputHeaders": {
+              "optional": false,
+              "type": {
+                "typeKind": "COMPOSITE",
+                "members": {},
+                "index": {
+                  "keyType": {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 1
+                  },
+                  "valueType": {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 1
+                  }
+                }
+              }
+            },
+            "outputStatus": {
+              "optional": false,
+              "type": {
+                "typeKind": "TUPLE",
+                "elements": [
+                  {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 3
+                  },
+                  {
+                    "typeKind": "PRIMITIVE",
+                    "primitiveTypeKind": 1
+                  }
+                ]
+              }
+            },
+            "outputTypes": {
+              "optional": false,
+              "type": {
+                "module": "",
+                "name": "Array"
+              }
+            }
+          }
+        }
+      },
+      "Extension": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "get": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  }
+                ]
+              }
+            },
+            "post": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "input",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "decorators": []
+                  }
+                ]
+              }
+            },
+            "put": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "input",
+                    "type": {
+                      "typeKind": "PRIMITIVE",
+                      "primitiveTypeKind": 5
+                    },
+                    "decorators": []
+                  }
+                ]
+              }
+            },
+            "delete": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": [
+                  {
+                    "name": "context",
+                    "type": {
+                      "module": "markscript-core/lib/server/extension",
+                      "name": "Context"
+                    },
+                    "decorators": []
+                  },
+                  {
+                    "name": "params",
+                    "type": {
+                      "typeKind": "COMPOSITE",
+                      "members": {},
+                      "index": {
+                        "keyType": {
+                          "typeKind": "PRIMITIVE",
+                          "primitiveTypeKind": 1
+                        },
+                        "valueType": {
+                          "typeKind": "UNION",
+                          "types": [
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 1
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 3
+                            },
+                            {
+                              "typeKind": "PRIMITIVE",
+                              "primitiveTypeKind": 2
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            },
+                            {
+                              "module": "",
+                              "name": "Array"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "decorators": []
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "types": {},
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  },
+  "markscript-typescript-example/lib/sampleTask": {
+    "classConstructors": {
+      "SampleTask": {
+        "instanceType": {
+          "typeKind": "COMPOSITE",
+          "members": {
+            "task": {
+              "type": {
+                "typeKind": "FUNCTION",
+                "parameters": []
+              },
+              "decorators": [
+                {
+                  "decoratorType": {
+                    "module": "markscript-core/lib/decorators",
+                    "name": "mlTask"
+                  },
+                  "parameters": [
+                    {
+                      "expressionKind": 5,
+                      "properties": {
+                        "type": {
+                          "enum": {
+                            "module": "markscript-core/lib/model",
+                            "name": "FrequencyType"
+                          },
+                          "value": "MINUTES",
+                          "expressionKind": 8
+                        },
+                        "frequency": {
+                          "expressionKind": 2,
+                          "value": 1
+                        },
+                        "user": {
+                          "expressionKind": 1,
+                          "value": "admin"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "staticType": {
+          "typeKind": "COMPOSITE",
+          "members": {},
+          "calls": []
+        },
+        "decorators": []
+      }
+    },
+    "interfaceConstructors": {},
+    "types": {},
+    "statics": {},
+    "reexports": {},
+    "namespaces": {}
+  }
+}

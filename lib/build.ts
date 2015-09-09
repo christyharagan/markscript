@@ -83,23 +83,37 @@ export class Build {
       alerts: {}
     }
 
-    model.databases = this.options.database.model.databases
-    model.servers = this.options.database.model.servers
-    model.tasks = this.options.database.model.tasks
-    model.alerts = this.options.database.model.alerts
-    model.ruleSets = this.options.database.model.ruleSets
+    if (this.options.database.model.databases) {
+      model.databases = this.options.database.model.databases
+    }
+    if (this.options.database.model.servers) {
+      model.servers = this.options.database.model.servers
+    }
+    if (this.options.database.model.tasks) {
+      model.tasks = this.options.database.model.tasks
+    }
+    if (this.options.database.model.alerts) {
+      model.alerts = this.options.database.model.alerts
+    }
+    if (this.options.database.model.ruleSets) {
+      model.ruleSets = this.options.database.model.ruleSets
+    }
     model.contentDatabase = this.options.database.model.contentDatabase
     model.modulesDatabase = this.options.database.model.modulesDatabase
     model.securityDatabase = this.options.database.model.securityDatabase
     model.schemaDatabase = this.options.database.model.schemaDatabase
     model.triggersDatabase = this.options.database.model.triggersDatabase
 
-    Object.keys(this.options.database.model.modules).forEach(function(name) {
-      model.modules[name] = { name: name, code: '' }
-    })
-    Object.keys(this.options.database.model.extensions).forEach(function(name) {
-      model.extensions[name] = { name: name, code: '' }
-    })
+    if (this.options.database.model.modules) {
+      Object.keys(this.options.database.model.modules).forEach(function(name) {
+        model.modules[name] = { name: name, code: '' }
+      })
+    }
+    if (this.options.database.model.extensions) {
+      Object.keys(this.options.database.model.extensions).forEach(function(name) {
+        model.extensions[name] = { name: name, code: '' }
+      })
+    }
 
     if (!fs.existsSync(dirName)) {
       fs.mkdirSync(dirName)
@@ -221,7 +235,7 @@ export class Build {
   deployAssets(): Promise<boolean> {
     this.buildModel()
     let self = this
-    return d.deployAssets(getClient(this.options, this.options.database.adminPort), function(database) {
+    return d.deployAssets(getClient(this.options, this.options.database.adminPort), getClient(this.options, this.options.database.configPort), function(database) {
       return getClient(self.options, self.options.database.httpPort, database)
     }, new d.StandardAssetDeployer(), this.options.database.model, this.options.database.model)
   }

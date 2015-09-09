@@ -1,0 +1,129 @@
+{
+  "databases": {
+    "markscript-ts-examples-content": {
+      "name": "markscript-ts-examples-content",
+      "triples": true,
+      "forests": [
+        {
+          "name": "markscript-ts-examples-content",
+          "database": "markscript-ts-examples-content",
+          "host": "christys-macbook-pro.local"
+        }
+      ],
+      "schemaDatabase": "markscript-ts-examples-schema",
+      "triggersDatabase": "markscript-ts-examples-triggers",
+      "rangeIndices": [],
+      "geoIndices": []
+    },
+    "markscript-ts-examples-triggers": {
+      "name": "markscript-ts-examples-triggers",
+      "forests": [
+        {
+          "name": "markscript-ts-examples-triggers",
+          "database": "markscript-ts-examples-triggers",
+          "host": "christys-macbook-pro.local"
+        }
+      ]
+    },
+    "markscript-ts-examples-modules": {
+      "name": "markscript-ts-examples-modules",
+      "forests": [
+        {
+          "name": "markscript-ts-examples-modules",
+          "database": "markscript-ts-examples-modules",
+          "host": "christys-macbook-pro.local"
+        }
+      ]
+    },
+    "markscript-ts-examples-schema": {
+      "name": "markscript-ts-examples-schema",
+      "forests": [
+        {
+          "name": "markscript-ts-examples-schema",
+          "database": "markscript-ts-examples-schema",
+          "host": "christys-macbook-pro.local"
+        }
+      ]
+    }
+  },
+  "servers": {
+    "markscript-ts-examples": {
+      "name": "markscript-ts-examples",
+      "host": "christys-macbook-pro.local",
+      "port": 8005,
+      "group": "Default",
+      "modulesDatabase": "markscript-ts-examples-modules",
+      "contentDatabase": "markscript-ts-examples-content"
+    }
+  },
+  "ruleSets": [
+    {
+      "path": "/rules/twitter.rules",
+      "rules": "PREFIX ms: <http://megastore.com/>\n\nrule \"isHighValueCustomer\" CONSTRUCT {\n  ?customer ms:is ms:highValue\n}{\n  ?customer ms:tweeted ?tweet .\n  ?tweet ms:sentiment ms:positiveSentiment\n}"
+    }
+  ],
+  "modules": {
+    "/_alerts/markscript-typescript-example/lib/sampleAlert/SampleAlert/alert": {
+      "name": "/_alerts/markscript-typescript-example/lib/sampleAlert/SampleAlert/alert",
+      "code": ""
+    },
+    "/_tasks/markscript-typescript-example/lib/sampleTask/SampleTask/task": {
+      "name": "/_tasks/markscript-typescript-example/lib/sampleTask/SampleTask/task",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleAlert": {
+      "name": "/markscript-typescript-example/lib/sampleAlert",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleDatabaseModel": {
+      "name": "/markscript-typescript-example/lib/sampleDatabaseModel",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleExtension": {
+      "name": "/markscript-typescript-example/lib/sampleExtension",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleModule": {
+      "name": "/markscript-typescript-example/lib/sampleModule",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleTask": {
+      "name": "/markscript-typescript-example/lib/sampleTask",
+      "code": ""
+    },
+    "markscript-core": {
+      "name": "markscript-core",
+      "code": ""
+    },
+    "speckle": {
+      "name": "speckle",
+      "code": ""
+    }
+  },
+  "extensions": {
+    "_extensions-markscript-typescript-example-lib-sampleExtension-SampleExtension": {
+      "name": "_extensions-markscript-typescript-example-lib-sampleExtension-SampleExtension",
+      "code": ""
+    }
+  },
+  "tasks": {
+    "markscript-typescript-example-lib-sampleTask-SampleTask-task": {
+      "type": 0,
+      "frequency": 1,
+      "user": "admin",
+      "name": "markscript-typescript-example-lib-sampleTask-SampleTask-task",
+      "module": "/_tasks/markscript-typescript-example/lib/sampleTask/SampleTask/task"
+    }
+  },
+  "alerts": {
+    "markscript-typescript-example-lib-sampleAlert-SampleAlert-alert": {
+      "name": "markscript-typescript-example-lib-sampleAlert-SampleAlert-alert",
+      "scope": "/sampleDir",
+      "actionModule": "/_alerts/markscript-typescript-example/lib/sampleAlert/SampleAlert/alert"
+    }
+  },
+  "contentDatabase": "markscript-ts-examples-content",
+  "modulesDatabase": "markscript-ts-examples-modules",
+  "schemaDatabase": "markscript-ts-examples-schema",
+  "triggersDatabase": "markscript-ts-examples-triggers"
+}

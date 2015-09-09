@@ -1,0 +1,127 @@
+{
+  "databases": {
+    "markscript-js-examples-content": {
+      "name": "markscript-js-examples-content",
+      "triples": true,
+      "forests": [
+        {
+          "name": "markscript-js-examples-content",
+          "database": "markscript-js-examples-content",
+          "host": "christys-macbook-pro.local"
+        }
+      ],
+      "schemaDatabase": "markscript-js-examples-schema",
+      "triggersDatabase": "markscript-js-examples-triggers"
+    },
+    "markscript-js-examples-triggers": {
+      "name": "markscript-js-examples-triggers",
+      "forests": [
+        {
+          "name": "markscript-js-examples-triggers",
+          "database": "markscript-js-examples-triggers",
+          "host": "christys-macbook-pro.local"
+        }
+      ]
+    },
+    "markscript-js-examples-modules": {
+      "name": "markscript-js-examples-modules",
+      "forests": [
+        {
+          "name": "markscript-js-examples-modules",
+          "database": "markscript-js-examples-modules",
+          "host": "christys-macbook-pro.local"
+        }
+      ]
+    },
+    "markscript-js-examples-schema": {
+      "name": "markscript-js-examples-schema",
+      "forests": [
+        {
+          "name": "markscript-js-examples-schema",
+          "database": "markscript-js-examples-schema",
+          "host": "christys-macbook-pro.local"
+        }
+      ]
+    }
+  },
+  "servers": {
+    "markscript-js-examples": {
+      "name": "markscript-js-examples",
+      "host": "christys-macbook-pro.local",
+      "port": 8005,
+      "group": "Default",
+      "modulesDatabase": "markscript-js-examples-modules",
+      "contentDatabase": "markscript-js-examples-content"
+    }
+  },
+  "ruleSets": [
+    {
+      "path": "/rules/logic.rules",
+      "rules": "PREFIX l: <http://logic/>\n\nrule \"negationTa\" CONSTRUCT {\n  ?b l:is l:false\n}{\n  ?a l:is l:true .\n  ?a l:not ?b\n}\nrule \"negationTb\" CONSTRUCT {\n  ?a l:is l:false\n}{\n  ?b l:is l:true .\n  ?a l:not ?b\n}\nrule \"negationFa\" CONSTRUCT {\n  ?b l:is l:true\n}{\n  ?a l:is l:false .\n  ?a l:not ?b\n}\nrule \"negationFb\" CONSTRUCT {\n  ?a l:is l:true\n}{\n  ?b l:is l:false .\n  ?a l:not ?b\n}\nrule \"conjunction\" CONSTRUCT {\n  ?a l:is l:true\n}{\n  ?ab l:is l:true .\n  ?ab l:and ?a\n}\nrule \"disjunction\" CONSTRUCT {\n  ?a l:is l:false\n}{\n  ?ab l:is l:false .\n  ?ab l:or ?a\n}\nrule \"modusPollens\" CONSTRUCT {\n  ?b l:is l:true\n}{\n  ?ab l:is l:true .\n  ?ab l:leftImplies ?a .\n  ?ab l:rightImplies ?b .\n  ?a l:is l:true\n}\nrule \"modusTollens\" CONSTRUCT {\n  ?a l:is l:false\n}{\n  ?ab l:is l:true .\n  ?ab l:leftImplies ?a .\n  ?ab l:rightImplies ?b .\n  ?b l:is l:false\n}\nrule \"conjunctiveSyllogism\" CONSTRUCT {\n  ?b l:is l:false\n}{\n  ?ab l:is l:false .\n  ?ab l:and ?a .\n  ?ab l:and ?b .\n  ?a l:is l:true\n}\nrule \"disjunctiveSyllogism\" CONSTRUCT {\n  ?b l:is l:true\n}{\n  ?ab l:is l:true .\n  ?ab l:or ?a .\n  ?ab l:or ?b .\n  ?a l:is l:false\n}"
+    },
+    {
+      "path": "/rules/logic.rules",
+      "rules": "PREFIX l: <http://logic/>\n\nrule \"negationTa\" CONSTRUCT {\n  ?b l:is l:false\n}{\n  ?a l:is l:true .\n  ?a l:not ?b\n}\nrule \"negationTb\" CONSTRUCT {\n  ?a l:is l:false\n}{\n  ?b l:is l:true .\n  ?a l:not ?b\n}\nrule \"negationFa\" CONSTRUCT {\n  ?b l:is l:true\n}{\n  ?a l:is l:false .\n  ?a l:not ?b\n}\nrule \"negationFb\" CONSTRUCT {\n  ?a l:is l:true\n}{\n  ?b l:is l:false .\n  ?a l:not ?b\n}\nrule \"conjunction\" CONSTRUCT {\n  ?a l:is l:true\n}{\n  ?ab l:is l:true .\n  ?ab l:and ?a\n}\nrule \"disjunction\" CONSTRUCT {\n  ?a l:is l:false\n}{\n  ?ab l:is l:false .\n  ?ab l:or ?a\n}\nrule \"modusPollens\" CONSTRUCT {\n  ?b l:is l:true\n}{\n  ?ab l:is l:true .\n  ?ab l:leftImplies ?a .\n  ?ab l:rightImplies ?b .\n  ?a l:is l:true\n}\nrule \"modusTollens\" CONSTRUCT {\n  ?a l:is l:false\n}{\n  ?ab l:is l:true .\n  ?ab l:leftImplies ?a .\n  ?ab l:rightImplies ?b .\n  ?b l:is l:false\n}\nrule \"conjunctiveSyllogism\" CONSTRUCT {\n  ?b l:is l:false\n}{\n  ?ab l:is l:false .\n  ?ab l:and ?a .\n  ?ab l:and ?b .\n  ?a l:is l:true\n}\nrule \"disjunctiveSyllogism\" CONSTRUCT {\n  ?b l:is l:true\n}{\n  ?ab l:is l:true .\n  ?ab l:or ?a .\n  ?ab l:or ?b .\n  ?a l:is l:false\n}"
+    }
+  ],
+  "modules": {
+    "/markscript-typescript-example/lib/logicRuleSet": {
+      "name": "/markscript-typescript-example/lib/logicRuleSet",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleAlert": {
+      "name": "/markscript-typescript-example/lib/sampleAlert",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleDatabaseModel": {
+      "name": "/markscript-typescript-example/lib/sampleDatabaseModel",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleExtension": {
+      "name": "/markscript-typescript-example/lib/sampleExtension",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleModule": {
+      "name": "/markscript-typescript-example/lib/sampleModule",
+      "code": ""
+    },
+    "/markscript-typescript-example/lib/sampleTask": {
+      "name": "/markscript-typescript-example/lib/sampleTask",
+      "code": ""
+    },
+    "markscript-core": {
+      "name": "markscript-core",
+      "code": ""
+    },
+    "speckle": {
+      "name": "speckle",
+      "code": ""
+    }
+  },
+  "extensions": {
+    "sampleExtension": {
+      "name": "sampleExtension",
+      "code": ""
+    }
+  },
+  "tasks": {
+    "sampleTask": {
+      "name": "sampleTask",
+      "frequency": 1,
+      "type": 0,
+      "user": "admin",
+      "module": "/markscript-typescript-example/lib/sampleTask"
+    }
+  },
+  "alerts": {
+    "sampleAlert": {
+      "name": "sampleAlert",
+      "scope": "/sampleDir/",
+      "actionModule": "/markscript-typescript-example/lib/sampleAlert"
+    }
+  },
+  "contentDatabase": "markscript-js-examples-content",
+  "modulesDatabase": "markscript-js-examples-modules",
+  "schemaDatabase": "markscript-js-examples-schema",
+  "triggersDatabase": "markscript-js-examples-triggers"
+}

@@ -16,6 +16,7 @@
         "tabSize": 2
     },
     "filesGlob": [
+        "./markscriptfile.ts",
         "./lib/**/*.ts",
         "./node_modules/speckle/speckle.d.ts",
         "../../node_modules/ml-typescript-definitions/*.d.ts",
@@ -24,11 +25,11 @@
         "../../node_modules/typescript/bin/typescript.d.ts"
     ],
     "files": [
+        "./markscriptfile.ts",
         "./lib/sampleAlert.ts",
         "./lib/sampleDatabaseModel.ts",
         "./lib/sampleExtension.ts",
         "./lib/sampleModule.ts",
-        "./lib/sampleRuleSet.ts",
         "./lib/sampleTask.ts",
         "./node_modules/speckle/speckle.d.ts",
         "../../node_modules/ml-typescript-definitions/client.d.ts",

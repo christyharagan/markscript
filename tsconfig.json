@@ -25,7 +25,6 @@
     "compileOnSave": true,
     "files": [
         "./lib/build.ts",
-        "./lib/client/search.ts",
         "./lib/decorators.ts",
         "./lib/deployer.ts",
         "./lib/index.ts",

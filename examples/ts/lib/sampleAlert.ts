@@ -1,4 +1,4 @@
-import {mlAlert} from '../../../../lib/decorators'
+import {mlAlert} from '../../../lib/decorators'
 
 export class SampleAlert {
   @mlAlert({

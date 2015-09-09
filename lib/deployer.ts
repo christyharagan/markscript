@@ -301,7 +301,7 @@ function select() {
 }
 exports.select = select;`
 
-export function deployAssets(adminClient: Client, createClient: (database: string) => Client, deployer: AssetDeployer, model: m.Model, assetModel: m.AssetModel): Promise<boolean> {
+export function deployAssets(adminClient: Client, configClient: Client, createClient: (database: string) => Client, deployer: AssetDeployer, model: m.Model, assetModel: m.AssetModel): Promise<boolean> {
   let promises: Promise<boolean>[] = []
 
   if (assetModel.ruleSets) {
@@ -314,9 +314,9 @@ export function deployAssets(adminClient: Client, createClient: (database: strin
   if (!assetModel.modules) {
     assetModel.modules = {}
   }
-  if (!assetModel.modules['markscript']) {
-    assetModel.modules['markscript'] = {
-      name: 'markscript',
+  if (!assetModel.modules['markscript-core']) {
+    assetModel.modules['markscript-core'] = {
+      name: 'markscript-core',
       code: markscriptCode
     }
   }
@@ -340,7 +340,7 @@ export function deployAssets(adminClient: Client, createClient: (database: strin
   }
   if (assetModel.tasks) {
     Object.keys(assetModel.tasks).forEach(function(name) {
-      promises.push(deployer.deployTask(adminClient, assetModel.tasks[name], model))
+      promises.push(deployer.deployTask(configClient, assetModel.tasks[name], model))
     })
   }
   if (assetModel.alerts) {

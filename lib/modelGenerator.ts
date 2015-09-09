@@ -123,12 +123,12 @@ export function generateAssetModel(schema: s.Map<s.Module>, definition: Object, 
             onClassConstructorDecorator: function(decorator) {
               switch (decorator.decoratorType.name) {
                 case 'mlExtension':
-                  let methods = []
+                  let methods:string[] = []
                   let isValid = false
 
                   s.visitClassConstructor(cc, {
                     onImplement: function(impl) {
-                      if (impl.name === 'Extension' && impl.constructorParent.name === 'markscript/dist/lib/server/extension') {
+                      if (s.interfaceConstructorToString(impl.typeConstructor) === 'markscript-core/lib/server/extension:Extension') {
                         isValid = true
                       }
                     },
@@ -148,17 +148,18 @@ export function generateAssetModel(schema: s.Map<s.Module>, definition: Object, 
                   })
 
                   if (!isValid) {
-                    throw new Error('A class annotated as a MarkLogic extension should implement ml-admin.Extension, at: ' + module.name + ':' + cc.name)
+                    throw new Error('A class annotated as a MarkLogic extension should implement markscript-core.Extension, at: ' + module.name + ':' + cc.name)
                   }
 
-                  let code = 'var ExtensionClass = r' + `equire(${toModuleName(module.name) }).${cc.name};
+                  let code = 'var ExtensionClass = r' + `equire("${toModuleName(module.name) }").${cc.name};
 var extensionObject = new ExtensionClass();
 `
                   methods.forEach(function(method) {
-                    code += `exports.${method} = extensionObject.${method}.bind(extensionObject)`
+                    code += `exports.${method.toUpperCase()} = extensionObject.${method}.bind(extensionObject);
+`
                   })
 
-                  let extensionModuleName = '/_extensions/' + s.classConstructorToString(cc).replace(/:/g, '/')
+                  let extensionModuleName = '_extensions-' + s.classConstructorToString(cc).replace(/:/g, '-').replace(/\//g, '-')
                   assetModel.extensions[extensionModuleName] = {
                     name: extensionModuleName,
                     code: code
@@ -184,17 +185,17 @@ var extensionObject = new ExtensionClass();
                           })
                           break
                         case 'mlAlert':
-                          if (cc.staticType.calls.length === 1 && cc.staticType.calls[0].parameters.length > 0) {
-                            throw new Error('A class annotated with a MarkLogic task must have a zero arg constructor, at: ' + module.name + ':' + cc.name + ':' + member.name)
+                          if (cc.staticType.calls && cc.staticType.calls.length === 1 && cc.staticType.calls[0].parameters.length > 0) {
+                            throw new Error('A class annotated with a MarkLogic alert must have a zero arg constructor, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
-                          if ((<s.Type>member.type).typeKind !== s.TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length > 0) {
-                            throw new Error('A class member annotated as a MarkLogic task must be a method of type (uri?:string, content?:cts.DocumentNode)=>void, at: ' + module.name + ':' + cc.name + ':' + member.name)
+                          if ((<s.Type>member.type).typeKind !== s.TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length !== 2) {
+                            throw new Error('A class member annotated as a MarkLogic alert must be a method of type (uri?:string, content?:cts.DocumentNode)=>void, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
                           let alertOptions = <d.AlertOptions>s.expressionToLiteral(decorator.parameters[0])
                           let alertModuleName = '/_alerts/' + s.classConstructorToString(cc).replace(/:/g, '/') + '/' + member.name
-                          let alertName = alertOptions.name || s.classConstructorToString(cc) + ':' + member.name
-                          assetModel.alerts[alertOptions.name] = {
-                            name: alertOptions.name,
+                          let alertName = alertOptions.name || (s.classConstructorToString(cc).replace(/\//g, '-').replace(/:/g, '-') + '-' + member.name)
+                          assetModel.alerts[alertName] = {
+                            name: alertName,
                             scope: alertOptions.scope,
                             states: alertOptions.states,
                             depth: alertOptions.depth,
@@ -203,14 +204,15 @@ var extensionObject = new ExtensionClass();
                           }
                           assetModel.modules[alertModuleName] = {
                             name: alertModuleName,
-                            code: 'var AlertClass = r' + `equire(${toModuleName(module.name) }).${cc.name};
+                            code: 'var AlertClass = r' + `equire("${toModuleName(module.name) }").${cc.name};
 var alertObject = new AlertClass();
 module.exports = function(uri, content){
   alertObject.${member.name}(uri, content);
 }`
                           }
+                          break
                         case 'mlTask':
-                          if (cc.staticType.calls.length === 1 && cc.staticType.calls[0].parameters.length > 0) {
+                          if (cc.staticType.calls && cc.staticType.calls.length === 1 && cc.staticType.calls[0].parameters.length > 0) {
                             throw new Error('A class annotated with a MarkLogic task must have a zero arg constructor, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
                           if ((<s.Type>member.type).typeKind !== s.TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length > 0) {
@@ -218,9 +220,9 @@ module.exports = function(uri, content){
                           }
                           let taskOptions = <d.TaskOptions>s.expressionToLiteral(decorator.parameters[0])
                           let taskModuleName = '/_tasks/' + s.classConstructorToString(cc).replace(/:/g, '/') + '/' + member.name
-                          let taskName = taskOptions.name || s.classConstructorToString(cc) + ':' + member.name
+                          let taskName = taskOptions.name || s.classConstructorToString(cc).replace(/\//g, '-').replace(/:/g, '-') + '-' + member.name
                           assetModel.tasks[taskName] = {
-                            type: taskOptions.type,
+                            type: taskOptions.type || m.FrequencyType.MINUTES,
                             frequency: taskOptions.frequency,
                             user: taskOptions.user || defaultTaskUser,
                             name: taskName,
@@ -228,7 +230,7 @@ module.exports = function(uri, content){
                           }
                           assetModel.modules[taskModuleName] = {
                             name: taskModuleName,
-                            code: 'var TaskClass = r' + `equire(${toModuleName(module.name) }).${cc.name};
+                            code: 'var TaskClass = r' + `equire("${toModuleName(module.name)}").${cc.name};
 var taskObject = new TaskClass();
 taskObject.${member.name}();`
                           }
