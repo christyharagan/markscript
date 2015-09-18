@@ -1,16 +1,14 @@
 {
   "name": "markscript-core",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A library for building JavaScript or TypeScript projects with MarkLogic.",
-  "main": "dist/lib/index.js",
+  "main": "lib/index.js",
+  "typings": "lib/index",
   "repository": "christyharagan/markscript",
   "author": {
     "name": "Christy Haragan",
     "email": "christy.haragan.github@gmail.com",
     "url": "https://github.com/christyharagan"
-  },
-  "typescript": {
-    "definition": "markscript.d.ts"
   },
   "keywords": [
     "marklogic",
@@ -22,7 +20,7 @@
     "babel": "^5.8.23",
     "glob": "^5.0.14",
     "marklogic": "1.0.2",
-    "ml-admin": "^0.3.0",
+    "ml-admin": "^0.4.0",
     "ml-typescript-definitions": "^0.3.0",
     "resolve": "^1.1.6",
     "speckle": "^0.1.3",

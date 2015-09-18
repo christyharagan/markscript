@@ -1,8 +1,8 @@
-import {BuildOptions} from 'markscript'
+import {BuildOptions} from '../../src/lib/build'
 import {TypeScriptExample} from './lib/sampleDatabaseModel'
 import * as path from 'path'
 
-export const COMMON = {
+const COMMON = {
   appName: 'markscript-ts-examples',
   ml: {
     port: 8005,

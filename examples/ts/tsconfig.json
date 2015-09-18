@@ -31,7 +31,6 @@
         "./lib/sampleExtension.ts",
         "./lib/sampleModule.ts",
         "./lib/sampleTask.ts",
-        "./node_modules/speckle/speckle.d.ts",
         "../../node_modules/ml-typescript-definitions/client.d.ts",
         "../../node_modules/ml-typescript-definitions/server.d.ts",
         "../../typings/es6/es6.d.ts",
@@ -42,10 +41,6 @@
         "../../typings/should-promised/should-promised.d.ts",
         "../../typings/should/should.d.ts",
         "../../typings/tsd.d.ts",
-        "../../node_modules/ml-admin/ml-admin.d.ts",
-        "../../node_modules/speckle/speckle.d.ts",
-        "../../node_modules/typescript-package/typescript-package.d.ts",
-        "../../node_modules/typescript-schema/typescript-schema.d.ts",
         "../../node_modules/typescript/bin/typescript.d.ts"
     ]
 }

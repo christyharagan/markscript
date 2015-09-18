@@ -31,7 +31,7 @@ export interface BuildOptions {
     model?: m.Model&m.AssetModel
     defaultTaskUser?: string
 
-    modules?: string|string[]//|{ [fileName: string]: string }
+    modules?: string | string[]
     ruleSets?: m.RuleSetSpec[]
     tasks?: m.TaskSpec[]
     alerts?: m.AlertSpec[]
@@ -43,7 +43,7 @@ export interface BuildOptions {
   }
   plugins?: { [pluginName: string]: PluginAndOptions<any> },
   pkgDir?: string,
-  typeModel?: s.Map<s.Module>
+  typeModel?: s.KeyValue<s.Module>
 }
 
 export class Build {
@@ -140,9 +140,8 @@ export class Build {
         }
 
         if (!this.options.typeModel) {
-          fs.writeFileSync(path.join(this.options.pkgDir, 'type-model.json'), s.stringifyModules(s.filterRawModules((moduleName: string) => moduleName.indexOf(p.getPackageJson(this.options.pkgDir).name) === 0, p.generateRawPackage(this.options.pkgDir))))
-
-          this.options.typeModel = s.convertRawModules(s.filterRawModules((moduleName: string) => moduleName.indexOf(p.getPackageJson(this.options.pkgDir).name) === 0, p.generateRawPackage(this.options.pkgDir)))
+          let rawPackage: s.KeyValue<s.RawTypeContainer> = p.generateRawPackage(this.options.pkgDir)
+          this.options.typeModel = s.convertRawModules(s.filterRawModules((moduleName: string) => moduleName.indexOf(p.getPackageJson(this.options.pkgDir).name) === 0, rawPackage))
         }
 
         this.options.database.model = mg.generateModel(this.options.typeModel, this.options.database.modelObject, this.options.database.host)
@@ -154,9 +153,6 @@ export class Build {
         this.options.database.model = JSON.parse(fs.readFileSync(path.join(this.options.pkgDir, 'database-model.json')).toString())
       }
     }
-    // if (!this.options.database.modelObject) {
-    //   throw new Error('To build the database model, a correctly annotated object specifing the database information must be provided')
-    // }
 
     if (this.options.database.modules) {
       if (Array.isArray(this.options.database.modules)) {
@@ -169,14 +165,6 @@ export class Build {
           throw new Error('To load modules, a package directory must be specified')
         }
         mg.addModules(this.options.database.model, this.options.pkgDir, glob.sync(<string>this.options.database.modules, { cwd: this.options.pkgDir }))
-        // } else {
-        //   let moduleMap = <{ [fileName: string]: string }>this.options.database.modulesToDeploy
-        //   if (!this.options.database.model.modules) {
-        //     this.options.database.model.modules = {}
-        //   }
-        //   Object.keys(moduleMap).forEach(function(name) {
-        //     self.options.database.model.modules[name] = { name: name, code: moduleMap[name] }
-        //   })
       }
     }
     if (this.options.database.extensions) {
