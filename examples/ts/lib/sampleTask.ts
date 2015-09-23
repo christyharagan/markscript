@@ -1,5 +1,5 @@
-import {mlTask} from '../../../lib/decorators'
-import {FrequencyType} from '../../../lib/model'
+import {mlTask} from 'markscript'
+import {FrequencyType} from 'markscript'
 
 export class SampleTask {
   @mlTask({

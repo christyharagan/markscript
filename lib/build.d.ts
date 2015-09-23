@@ -34,7 +34,7 @@ export interface BuildOptions {
         [pluginName: string]: PluginAndOptions<any>;
     };
     pkgDir?: string;
-    typeModel?: s.KeyValue<s.Module>;
+    typeModel?: s.KeyValue<s.reflective.Module>;
 }
 export declare class Build {
     protected options: BuildOptions;

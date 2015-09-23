@@ -1,4 +1,3 @@
-import * as s from 'typescript-schema';
 export interface User {
     name: string;
     password: string;
@@ -57,9 +56,6 @@ export declare enum TRIGGER_STATE {
     CREATE = 0,
     MODIFY = 1,
     DELETE = 2,
-}
-export interface MethodReference extends s.Reference {
-    methodName: string;
 }
 export interface AlertSpec {
     name: string;

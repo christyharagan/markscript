@@ -1,3 +1,4 @@
+// TODO: Currently, the logic doesn't work well when chaining commands together (e.g. for a redeploy)
 var s = require('typescript-schema');
 var p = require('typescript-package');
 var a = require('ml-admin');
@@ -84,6 +85,7 @@ var Build = (function () {
         }
     };
     Build.prototype.buildModel = function () {
+        var _this = this;
         var self = this;
         if (!this.options.database.model) {
             if (this.options.database.modelObject) {
@@ -91,8 +93,8 @@ var Build = (function () {
                     throw new Error('To build the database model, either a type model must be provided, or a package directory from which to generate one');
                 }
                 if (!this.options.typeModel) {
-                    var rawPackage = p.packageAstToFactory(this.options.pkgDir);
-                    this.options.typeModel = rawPackage.construct(s.factoryToReflective())().modules;
+                    var rawPackage = p.generateRawPackage(this.options.pkgDir);
+                    this.options.typeModel = s.convertRawModules(s.filterRawModules(function (moduleName) { return moduleName.indexOf(p.getPackageJson(_this.options.pkgDir).name) === 0; }, rawPackage));
                 }
                 this.options.database.model = mg.generateModel(this.options.typeModel, this.options.database.modelObject, this.options.database.host);
                 mg.generateAssetModel(this.options.typeModel, this.options.database.modelObject, this.options.database.model, this.options.database.defaultTaskUser || this.options.database.user);

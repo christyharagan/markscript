@@ -1,4 +1,4 @@
-import * as s from 'typescript-schema'
+import {reflective as s, visitType, TypeVisitor, TypeKind, expressionToLiteral, PrimitiveTypeKind, MemberVisitor, interfaceConstructorToString, classConstructorToString, KeyValue, visitModules, CompositeTypeVisitor, visitClassConstructor, ContainerVisitor, ClassConstructorVisitor} from 'typescript-schema'
 import * as m from './model'
 import * as d from './decorators'
 import * as t from 'typescript'
@@ -50,7 +50,7 @@ function toScalarType(rangeOptions: d.RangeIndexedOptions, member: s.DecoratedMe
     }
   } else {
     let value: string
-    s.visitType(<s.Type>member.type, <s.TypeVisitor>{
+    visitType(<s.Type>member.type, <TypeVisitor>{
       onString: function() {
         value = 'string'
       },
@@ -58,7 +58,7 @@ function toScalarType(rangeOptions: d.RangeIndexedOptions, member: s.DecoratedMe
         value = 'float'
       },
       onArrayType: function(arr) {
-        return <s.TypeVisitor>{
+        return <TypeVisitor>{
           onString: function() {
             value = 'string'
           },
@@ -88,7 +88,7 @@ function toModuleName(name: string, packageName?: string) {
   return name
 }
 
-export function generateAssetModel(schema: s.Map<s.Module>, definition: Object, assetModel?: m.AssetModel, defaultTaskUser?: string): m.AssetModel {
+export function generateAssetModel(schema: KeyValue<s.Module>, definition: Object, assetModel?: m.AssetModel, defaultTaskUser?: string): m.AssetModel {
   if (assetModel) {
     if (!assetModel.ruleSets) {
       assetModel.ruleSets = []
@@ -115,25 +115,25 @@ export function generateAssetModel(schema: s.Map<s.Module>, definition: Object, 
     }
   }
 
-  s.visitModules(schema, {
+  visitModules(schema, {
     onModule: function(module) {
-      return <s.TypeContainerVisitor>{
+      return <ContainerVisitor>{
         onClassConstructor: function(cc) {
-          return <s.ClassConstructorVisitor>{
+          return <ClassConstructorVisitor>{
             onClassConstructorDecorator: function(decorator) {
               switch (decorator.decoratorType.name) {
                 case 'mlExtension':
                   let methods:string[] = []
                   let isValid = false
 
-                  s.visitClassConstructor(cc, {
+                  visitClassConstructor(cc, {
                     onImplement: function(impl) {
-                      if (s.interfaceConstructorToString(impl.typeConstructor) === 'markscript-core/lib/server/extension:Extension') {
+                      if (interfaceConstructorToString(impl.typeConstructor) === 'markscript-core/lib/server/extension:Extension') {
                         isValid = true
                       }
                     },
                     onInstanceType: function(it) {
-                      return <s.CompositeTypeVisitor>{
+                      return <CompositeTypeVisitor>{
                         onMember: function(member) {
                           switch (member.name) {
                             case 'get':
@@ -159,7 +159,7 @@ var extensionObject = new ExtensionClass();
 `
                   })
 
-                  let extensionModuleName = '_extensions-' + s.classConstructorToString(cc).replace(/:/g, '-').replace(/\//g, '-')
+                  let extensionModuleName = '_extensions-' + classConstructorToString(cc).replace(/:/g, '-').replace(/\//g, '-')
                   assetModel.extensions[extensionModuleName] = {
                     name: extensionModuleName,
                     code: code
@@ -167,16 +167,16 @@ var extensionObject = new ExtensionClass();
               }
             },
             onInstanceType: function(it) {
-              return <s.CompositeTypeVisitor>{
+              return <CompositeTypeVisitor>{
                 onMember: function(member) {
-                  return <s.MemberVisitor>{
+                  return <MemberVisitor>{
                     onMemberDecorator: function(decorator) {
                       switch (decorator.decoratorType.name) {
                         case 'mlRuleSet':
-                          if ((<s.PrimitiveType>member.type).primitiveTypeKind !== s.PrimitiveTypeKind.STRING && !((<s.FunctionType>member.type).typeKind === s.TypeKind.FUNCTION && (<s.PrimitiveType>(<s.FunctionType>member.type).type).primitiveTypeKind === s.PrimitiveTypeKind.STRING)) {
+                          if ((<s.PrimitiveType>member.type).primitiveTypeKind !== PrimitiveTypeKind.STRING && !((<s.FunctionType>member.type).typeKind === TypeKind.FUNCTION && (<s.PrimitiveType>(<s.FunctionType>member.type).type).primitiveTypeKind === PrimitiveTypeKind.STRING)) {
                             throw new Error('A class member annotated as a MarkLogic rule set must be a string property, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
-                          let path = (<d.RuleSetOptions>s.expressionToLiteral(decorator.parameters[0])).path
+                          let path = (<d.RuleSetOptions>expressionToLiteral(decorator.parameters[0])).path
                           let rules = definition[decorator.parent.name]()
 
                           assetModel.ruleSets.push({
@@ -188,12 +188,12 @@ var extensionObject = new ExtensionClass();
                           if (cc.staticType.calls && cc.staticType.calls.length === 1 && cc.staticType.calls[0].parameters.length > 0) {
                             throw new Error('A class annotated with a MarkLogic alert must have a zero arg constructor, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
-                          if ((<s.Type>member.type).typeKind !== s.TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length !== 2) {
+                          if ((<s.Type>member.type).typeKind !== TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length !== 2) {
                             throw new Error('A class member annotated as a MarkLogic alert must be a method of type (uri?:string, content?:cts.DocumentNode)=>void, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
-                          let alertOptions = <d.AlertOptions>s.expressionToLiteral(decorator.parameters[0])
-                          let alertModuleName = '/_alerts/' + s.classConstructorToString(cc).replace(/:/g, '/') + '/' + member.name
-                          let alertName = alertOptions.name || (s.classConstructorToString(cc).replace(/\//g, '-').replace(/:/g, '-') + '-' + member.name)
+                          let alertOptions = <d.AlertOptions>expressionToLiteral(decorator.parameters[0])
+                          let alertModuleName = '/_alerts/' + classConstructorToString(cc).replace(/:/g, '/') + '/' + member.name
+                          let alertName = alertOptions.name || (classConstructorToString(cc).replace(/\//g, '-').replace(/:/g, '-') + '-' + member.name)
                           assetModel.alerts[alertName] = {
                             name: alertName,
                             scope: alertOptions.scope,
@@ -215,12 +215,12 @@ module.exports = function(uri, content){
                           if (cc.staticType.calls && cc.staticType.calls.length === 1 && cc.staticType.calls[0].parameters.length > 0) {
                             throw new Error('A class annotated with a MarkLogic task must have a zero arg constructor, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
-                          if ((<s.Type>member.type).typeKind !== s.TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length > 0) {
+                          if ((<s.Type>member.type).typeKind !== TypeKind.FUNCTION || (<s.FunctionType>member.type).parameters.length > 0) {
                             throw new Error('A class member annotated as a MarkLogic task must be a method with zero parameters, at: ' + module.name + ':' + cc.name + ':' + member.name)
                           }
-                          let taskOptions = <d.TaskOptions>s.expressionToLiteral(decorator.parameters[0])
-                          let taskModuleName = '/_tasks/' + s.classConstructorToString(cc).replace(/:/g, '/') + '/' + member.name
-                          let taskName = taskOptions.name || s.classConstructorToString(cc).replace(/\//g, '-').replace(/:/g, '-') + '-' + member.name
+                          let taskOptions = <d.TaskOptions>expressionToLiteral(decorator.parameters[0])
+                          let taskModuleName = '/_tasks/' + classConstructorToString(cc).replace(/:/g, '/') + '/' + member.name
+                          let taskName = taskOptions.name || classConstructorToString(cc).replace(/\//g, '-').replace(/:/g, '-') + '-' + member.name
                           assetModel.tasks[taskName] = {
                             type: taskOptions.type || m.FrequencyType.MINUTES,
                             frequency: taskOptions.frequency,
@@ -331,7 +331,7 @@ function removeDecorators(source: string): string {
   return source
 }
 
-export function generateModel(schema: s.Map<s.Module>, definition: Object, defaultHost?: string): m.Model {
+export function generateModel(schema: KeyValue<s.Module>, definition: Object, defaultHost?: string): m.Model {
   let model: m.Model = {
     databases: {},
     servers: {}
@@ -352,19 +352,19 @@ export function generateModel(schema: s.Map<s.Module>, definition: Object, defau
   }
   let databases: Databases = {}
 
-  s.visitModules(schema, {
+  visitModules(schema, {
     onModule: function(module) {
-      return <s.TypeContainerVisitor>{
+      return <ContainerVisitor>{
         onClassConstructor: function(cc) {
           let isDeployable = false
-          return <s.ClassConstructorVisitor>{
+          return <ClassConstructorVisitor>{
             onClassConstructorDecorator: function(decorator) {
               if (decorator.decoratorType.name === 'mlDeploy') {
                 isDeployable = true
               }
             },
             onInstanceType: function(it) {
-              return <s.CompositeTypeVisitor>{
+              return <CompositeTypeVisitor>{
                 onMember: function(member) {
                   if (isDeployable) {
                     let name = (<s.Interface>member.type).name
@@ -392,11 +392,11 @@ export function generateModel(schema: s.Map<s.Module>, definition: Object, defau
                     }
                   }
 
-                  return <s.MemberVisitor>{
+                  return <MemberVisitor>{
                     onMemberDecorator: function(decorator) {
                       switch (decorator.decoratorType.name) {
                         case 'rangeIndexed':
-                          let rangeOptions: d.RangeIndexedOptions = (decorator.parameters && decorator.parameters.length > 0) ? s.expressionToLiteral(decorator.parameters[0]) : {}
+                          let rangeOptions: d.RangeIndexedOptions = (decorator.parameters && decorator.parameters.length > 0) ? expressionToLiteral(decorator.parameters[0]) : {}
                           let scalarType = toScalarType(rangeOptions, decorator.parent)
                           if (scalarType) {
                             rangeIndices.push({
@@ -407,7 +407,7 @@ export function generateModel(schema: s.Map<s.Module>, definition: Object, defau
                           }
                           break;
                         case 'geoIndexed':
-                          let geoOptions: d.GeoIndexedOptions = (decorator.parameters && decorator.parameters.length > 0) ? s.expressionToLiteral(decorator.parameters[0]) : {}
+                          let geoOptions: d.GeoIndexedOptions = (decorator.parameters && decorator.parameters.length > 0) ? expressionToLiteral(decorator.parameters[0]) : {}
                           // TODO: Support more than point format (e.g. long-lat-point format)
                           let geoIndex: m.GeoIndexSpec = {
                             path: geoOptions.path || `/${decorator.parent.name}`,

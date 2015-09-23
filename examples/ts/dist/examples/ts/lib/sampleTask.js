@@ -6,8 +6,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
         case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
     }
 };
-var decorators_1 = require('../../../lib/decorators');
-var model_1 = require('../../../lib/model');
+var markscript_1 = require('markscript');
+var markscript_2 = require('markscript');
 var SampleTask = (function () {
     function SampleTask() {
     }
@@ -16,8 +16,8 @@ var SampleTask = (function () {
     };
     Object.defineProperty(SampleTask.prototype, "task",
         __decorate([
-            decorators_1.mlTask({
-                type: model_1.FrequencyType.MINUTES,
+            markscript_1.mlTask({
+                type: markscript_2.FrequencyType.MINUTES,
                 frequency: 1,
                 user: 'admin'
             })

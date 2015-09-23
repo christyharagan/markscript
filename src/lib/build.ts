@@ -43,7 +43,7 @@ export interface BuildOptions {
   }
   plugins?: { [pluginName: string]: PluginAndOptions<any> },
   pkgDir?: string,
-  typeModel?: s.KeyValue<s.Module>
+  typeModel?: s.KeyValue<s.reflective.Module>
 }
 
 export class Build {
@@ -140,8 +140,9 @@ export class Build {
         }
 
         if (!this.options.typeModel) {
-          let rawPackage: s.KeyValue<s.RawTypeContainer> = p.generateRawPackage(this.options.pkgDir)
-          this.options.typeModel = s.convertRawModules(s.filterRawModules((moduleName: string) => moduleName.indexOf(p.getPackageJson(this.options.pkgDir).name) === 0, rawPackage))
+          let rawPackage: s.PackageFactory = p.packageAstToFactory(this.options.pkgDir)
+          this.options.typeModel = rawPackage.construct(s.factoryToReflective())().modules
+          //this.options.typeModel = s.convertRawModules(s.filterRawModules((moduleName: string) => moduleName.indexOf(p.getPackageJson(this.options.pkgDir).name) === 0, rawPackage))
         }
 
         this.options.database.model = mg.generateModel(this.options.typeModel, this.options.database.modelObject, this.options.database.host)
