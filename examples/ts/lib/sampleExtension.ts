@@ -1,5 +1,5 @@
-import {mlExtension} from '../../../lib/decorators'
-import {Extension, Context, Parameters} from '../../../lib/server/extension'
+import {mlExtension} from 'markscript-core'
+import {Extension, Context, Parameters} from 'markscript-core'
 import * as sampleModule from './sampleModule'
 
 @mlExtension()

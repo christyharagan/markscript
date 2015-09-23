@@ -1,5 +1,5 @@
-import {mlTask} from 'markscript'
-import {FrequencyType} from 'markscript'
+import {mlTask} from 'markscript-core'
+import {FrequencyType} from 'markscript-core'
 
 export class SampleTask {
   @mlTask({

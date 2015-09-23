@@ -1,4 +1,4 @@
-import {mlAlert} from '../../../lib/decorators'
+import {mlAlert} from 'markscript-core'
 
 export class SampleAlert {
   @mlAlert({

@@ -1,4 +1,4 @@
-import {BuildOptions} from '../../src/lib/build'
+import {BuildOptions} from 'markscript-core'
 import {TypeScriptExample} from './lib/sampleDatabaseModel'
 import * as path from 'path'
 

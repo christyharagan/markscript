@@ -1,7 +1,7 @@
-import {ServerSpec, DatabaseSpec} from '../../../lib/model'
-import {mlDeploy, contentDatabase, triggersDatabase, modulesDatabase, schemaDatabase, mlRuleSet} from '../../../lib/decorators'
+import {ServerSpec, DatabaseSpec} from 'markscript-core'
+import {mlDeploy, contentDatabase, triggersDatabase, modulesDatabase, schemaDatabase, mlRuleSet} from 'markscript-core'
 import {rule, variable, prefix} from 'speckle'
-import {BuildOptions} from '../../../lib/build'
+import {BuildOptions} from 'markscript-core'
 
 @mlDeploy()
 export class TypeScriptExample {

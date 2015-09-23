@@ -18,10 +18,8 @@
     "filesGlob": [
         "./markscriptfile.ts",
         "./lib/**/*.ts",
-        "./node_modules/speckle/speckle.d.ts",
-        "../../node_modules/ml-typescript-definitions/*.d.ts",
-        "../../typings/**/*.d.ts",
-        "../../node_modules/*/*.d.ts",
+        "./typings/**/*.ts",
+        "./node_modules/ml-typescript-definitions/*.d.ts",
         "../../node_modules/typescript/bin/typescript.d.ts"
     ],
     "files": [
@@ -31,16 +29,11 @@
         "./lib/sampleExtension.ts",
         "./lib/sampleModule.ts",
         "./lib/sampleTask.ts",
-        "../../node_modules/ml-typescript-definitions/client.d.ts",
-        "../../node_modules/ml-typescript-definitions/server.d.ts",
-        "../../typings/es6/es6.d.ts",
-        "../../typings/glob/glob.d.ts",
-        "../../typings/minimatch/minimatch.d.ts",
-        "../../typings/mocha/mocha.d.ts",
-        "../../typings/node/node.d.ts",
-        "../../typings/should-promised/should-promised.d.ts",
-        "../../typings/should/should.d.ts",
-        "../../typings/tsd.d.ts",
+        "./typings/es6/es6.d.ts",
+        "./typings/node/node.d.ts",
+        "./typings/tsd.d.ts",
+        "./node_modules/ml-typescript-definitions/client.d.ts",
+        "./node_modules/ml-typescript-definitions/server.d.ts",
         "../../node_modules/typescript/bin/typescript.d.ts"
     ]
 }

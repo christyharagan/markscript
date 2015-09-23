@@ -1,9 +1,9 @@
 {
   "name": "markscript-core",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A library for building JavaScript or TypeScript projects with MarkLogic.",
   "main": "lib/index.js",
-  "typings": "lib/index",
+  "typings": "lib/index.d.ts",
   "repository": "christyharagan/markscript",
   "author": {
     "name": "Christy Haragan",
@@ -25,7 +25,7 @@
     "resolve": "^1.1.6",
     "speckle": "^0.1.3",
     "typescript": "^1.6.2",
-    "typescript-schema": "^0.7.0",
-    "typescript-package": "^0.3.0"
+    "typescript-schema": "^0.7.2",
+    "typescript-package": "^0.3.1"
   }
 }
