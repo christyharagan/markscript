@@ -9,7 +9,8 @@
         "sourceMap": true,
         "sourceRoot": ".",
         "target": "es5",
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "moduleResolution": "node"
     },
     "formatCodeOptions": {
         "indentSize": 2,
@@ -19,8 +20,7 @@
         "./markscriptfile.ts",
         "./lib/**/*.ts",
         "./typings/**/*.ts",
-        "./node_modules/ml-typescript-definitions/*.d.ts",
-        "../../node_modules/typescript/bin/typescript.d.ts"
+        "./node_modules/ml-typescript-definitions/*.d.ts"
     ],
     "files": [
         "./markscriptfile.ts",
@@ -33,7 +33,6 @@
         "./typings/node/node.d.ts",
         "./typings/tsd.d.ts",
         "./node_modules/ml-typescript-definitions/client.d.ts",
-        "./node_modules/ml-typescript-definitions/server.d.ts",
-        "../../node_modules/typescript/bin/typescript.d.ts"
+        "./node_modules/ml-typescript-definitions/server.d.ts"
     ]
 }

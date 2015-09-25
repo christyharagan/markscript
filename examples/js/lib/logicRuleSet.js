@@ -2,7 +2,6 @@ var speckle = require('speckle')
 var rule = speckle.rule
 var variable = speckle.variable
 var prefix = speckle.prefix
-//import {rule, variable, prefix} from 'speckle'
 
 exports.logicRuleSet = function() {
   var logic = prefix('l', 'http://logic/')
