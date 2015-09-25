@@ -37,7 +37,7 @@ export interface BuildOptions {
     alerts?: m.AlertSpec[]
     extensions?: { [extensionName: string]: string }
   }
-  middle: {
+  middle?: {
     host: string
     port: number
   }
@@ -142,7 +142,6 @@ export class Build {
         if (!this.options.typeModel) {
           let rawPackage: s.PackageFactory = p.packageAstToFactory(this.options.pkgDir)
           this.options.typeModel = rawPackage.construct(s.factoryToReflective())().modules
-          //this.options.typeModel = s.convertRawModules(s.filterRawModules((moduleName: string) => moduleName.indexOf(p.getPackageJson(this.options.pkgDir).name) === 0, rawPackage))
         }
 
         this.options.database.model = mg.generateModel(this.options.typeModel, this.options.database.modelObject, this.options.database.host)
