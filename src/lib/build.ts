@@ -9,6 +9,7 @@ import * as glob from 'glob'
 import * as m from './model'
 import * as d from './deployer'
 import * as mg from './modelGenerator'
+import {ConnectionParams, createDatabaseClient} from 'marklogic'
 
 let resolve = require('resolve')
 
@@ -241,14 +242,12 @@ export class Build {
 }
 
 function getClient(options: BuildOptions, port: number, database?: string) {
-  let params: a.AdminConnectionParams = {
+  let params: ConnectionParams = {
     host: options.database.host,
     port: port,
     user: options.database.user,
     password: options.database.password,
+    database: database || 'Documents'
   }
-  if (database) {
-    params.database = database
-  }
-  return a.createAdminClient(params)
+  return createDatabaseClient(params)
 }

@@ -128,7 +128,7 @@ export function generateAssetModel(schema: KeyValue<s.Module>, definition: Objec
 
                   visitClassConstructor(cc, {
                     onImplement: function(impl) {
-                      if (interfaceConstructorToString(impl.typeConstructor) === 'markscript-core/lib/server/extension:Extension') {
+                      if (interfaceConstructorToString(<s.InterfaceConstructor>impl.typeConstructor) === 'markscript-core/lib/server/extension:Extension') {
                         isValid = true
                       }
                     },
@@ -257,14 +257,13 @@ function loadCode(packageDir: string, modulePath: string): string {
   if (fileName.substring(fileName.length - 3).toLowerCase() === '.ts') {
     code = removeDecorators(code)
     code = t.transpile(code, {
-      target: t.ScriptTarget.ES5,
-      module: t.ModuleKind.CommonJS
+      target: t.ScriptTarget.ES6
     })
-  } else {
-    code = babel.transform(code, {
-      optional: ['es6.spec.templateLiterals', 'es6.spec.blockScoping', 'es6.spec.symbols']
-    }).code
   }
+
+  code = babel.transform(code, {
+    optional: ['es6.spec.templateLiterals', 'es6.spec.blockScoping', 'es6.spec.symbols']
+  }).code
 
   return code
 }

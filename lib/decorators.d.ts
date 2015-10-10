@@ -1,5 +1,4 @@
 import * as m from './model';
-import { Extension } from './server/extension';
 export declare function contentDatabase(): (target: Object, propertyKey: string) => void;
 export declare function triggersDatabase(): (target: Object, propertyKey: string) => void;
 export declare function schemaDatabase(): (target: Object, propertyKey: string) => void;
@@ -59,4 +58,4 @@ export interface AlertOptions {
     commit?: m.TRIGGER_COMMIT;
 }
 export declare function mlAlert(definition?: AlertOptions): (target: Object, propertyKey: string) => void;
-export declare function mlExtension(): <S extends Extension>(target: S) => S;
+export declare function mlExtension(): (target: any) => any;

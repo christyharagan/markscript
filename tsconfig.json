@@ -1,12 +1,11 @@
 {
     "compilerOptions": {
-        "emitDecoratorMetadata": true,
-        "declaration": true,
+        "target": "es5",
         "module": "commonjs",
+        "declaration": true,
         "rootDir": "./src",
         "sourceMap": true,
         "sourceRoot": ".",
-        "target": "es5",
         "outDir": ".",
         "moduleResolution": "node"
     },
@@ -14,41 +13,18 @@
         "indentSize": 2,
         "tabSize": 2
     },
-    "filesGlob": [
-        "./src/**/*.ts",
-        "./lib/**/*.ts",
-        "./typings/**/*.d.ts",
-        "./node_modules/ml-typescript-definitions/*.d.ts"
-    ],
     "compileOnSave": true,
-    "files": [
-        "./src/lib/build.ts",
-        "./src/lib/decorators.ts",
-        "./src/lib/deployer.ts",
-        "./src/lib/index.ts",
-        "./src/lib/model.ts",
-        "./src/lib/modelGenerator.ts",
-        "./src/lib/modelVisitor.ts",
-        "./src/lib/server/extension.ts",
-        "./src/lib/server/utils.ts",
-        "./lib/build.d.ts",
-        "./lib/decorators.d.ts",
-        "./lib/deployer.d.ts",
-        "./lib/index.d.ts",
-        "./lib/model.d.ts",
-        "./lib/modelGenerator.d.ts",
-        "./lib/modelVisitor.d.ts",
-        "./lib/server/extension.d.ts",
-        "./lib/server/utils.d.ts",
-        "./typings/es6/es6.d.ts",
-        "./typings/glob/glob.d.ts",
-        "./typings/minimatch/minimatch.d.ts",
-        "./typings/mocha/mocha.d.ts",
-        "./typings/node/node.d.ts",
-        "./typings/should-promised/should-promised.d.ts",
-        "./typings/should/should.d.ts",
-        "./typings/tsd.d.ts",
-        "./node_modules/ml-typescript-definitions/client.d.ts",
-        "./node_modules/ml-typescript-definitions/server.d.ts"
+    "exclude": [
+      "node_modules/.bin",
+      "node_modules/babel",
+      "node_modules/glob",
+      "node_modules/marklogic",
+      "node_modules/marklogic-node-typescript-definitions/typings",
+      "node_modules/ml-admin",
+      "node_modules/resolve",
+      "node_modules/typescript",
+      "node_modules/typescript-package",
+      "node_modules/typescript-schema",
+      "examples"
     ]
 }

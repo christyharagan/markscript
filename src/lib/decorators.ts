@@ -1,6 +1,5 @@
 import * as m from './model'
 import * as s from 'typescript-schema'
-import {Extension} from './server/extension'
 
 export function contentDatabase() {
   return function(target: Object, propertyKey: string): void {
@@ -112,7 +111,7 @@ export function mlAlert(definition?: AlertOptions) {
 }
 
 export function mlExtension() {
-  return function <S extends Extension>(target: S) {
+  return function(target: any) {
     return target
   }
 }

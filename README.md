@@ -15,7 +15,7 @@ Usage
 
 Install:
 ```
-npm install markscript
+npm install markscript-core
 ```
 
 Basic Usage:

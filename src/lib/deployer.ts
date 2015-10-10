@@ -1,38 +1,40 @@
 import * as m from './model'
 import * as v from './modelVisitor'
-import {Client} from 'marklogic'
+import {DatabaseClient} from 'marklogic'
 import * as a from 'ml-admin'
 import * as path from 'path'
+import {installAlert} from './admin/alerts/installAlert'
+import {deleteAlert} from './admin/alerts/deleteAlert'
 
 export interface Deployer {
-  deployDatabase(client: Client, ifExists: m.IF_EXISTS, database: m.DatabaseSpec): Promise<boolean>
-  undeployDatabase(client: Client, database: m.DatabaseSpec): Promise<boolean>
+  deployDatabase(client: DatabaseClient, ifExists: m.IF_EXISTS, database: m.DatabaseSpec): Promise<boolean>
+  undeployDatabase(client: DatabaseClient, database: m.DatabaseSpec): Promise<boolean>
 
-  deployForest(client: Client, ifExists: m.IF_EXISTS, forest: m.ForestSpec): Promise<boolean>
-  undeployForest(client: Client, forest: m.ForestSpec): Promise<boolean>
+  deployForest(client: DatabaseClient, ifExists: m.IF_EXISTS, forest: m.ForestSpec): Promise<boolean>
+  undeployForest(client: DatabaseClient, forest: m.ForestSpec): Promise<boolean>
 
-  deployServer(client: Client, ifExists: m.IF_EXISTS, server: m.ServerSpec): Promise<boolean>
-  undeployServer(client: Client, server: m.ServerSpec): Promise<boolean>
+  deployServer(client: DatabaseClient, ifExists: m.IF_EXISTS, server: m.ServerSpec): Promise<boolean>
+  undeployServer(client: DatabaseClient, server: m.ServerSpec): Promise<boolean>
 }
 
 export interface AssetDeployer {
-  deployRuleSet(client: Client, spec: m.RuleSetSpec): Promise<boolean>
-  undeployRuleSet(client: Client, spec: m.RuleSetSpec): Promise<boolean>
+  deployRuleSet(client: DatabaseClient, spec: m.RuleSetSpec): Promise<boolean>
+  undeployRuleSet(client: DatabaseClient, spec: m.RuleSetSpec): Promise<boolean>
 
-  deployModule(client: Client, spec: m.ModuleSpec): Promise<boolean>
-  undeployModule(client: Client, spec: m.ModuleSpec): Promise<boolean>
+  deployModule(client: DatabaseClient, spec: m.ModuleSpec): Promise<boolean>
+  undeployModule(client: DatabaseClient, spec: m.ModuleSpec): Promise<boolean>
 
-  deployExtension(client: Client, spec: m.ExtensionSpec): Promise<boolean>
-  undeployExtension(client: Client, spec: m.ExtensionSpec): Promise<boolean>
+  deployExtension(client: DatabaseClient, spec: m.ExtensionSpec): Promise<boolean>
+  undeployExtension(client: DatabaseClient, spec: m.ExtensionSpec): Promise<boolean>
 
-  deployAlert(client: Client, spec: m.AlertSpec): Promise<boolean>
-  undeployAlert(client: Client, spec: m.AlertSpec): Promise<boolean>
+  deployAlert(client: DatabaseClient, spec: m.AlertSpec): Promise<boolean>
+  undeployAlert(client: DatabaseClient, spec: m.AlertSpec): Promise<boolean>
 
-  deployTask(client: Client, spec: m.TaskSpec, model: m.Model): Promise<boolean>
-  undeployTask(client: Client, spec: m.TaskSpec, model: m.Model): Promise<boolean>
+  deployTask(client: DatabaseClient, spec: m.TaskSpec, model: m.Model): Promise<boolean>
+  undeployTask(client: DatabaseClient, spec: m.TaskSpec, model: m.Model): Promise<boolean>
 }
 
-export function deploy(client: Client, deployer: Deployer, ifExists: m.IF_EXISTS, model: m.Model): Promise<boolean> {
+export function deploy(client: DatabaseClient, deployer: Deployer, ifExists: m.IF_EXISTS, model: m.Model): Promise<boolean> {
   let promise: Promise<boolean>
   if (model.securityDatabase) {
     promise = deployDatabase(client, deployer, ifExists, model.databases[model.securityDatabase])
@@ -79,7 +81,7 @@ export function deploy(client: Client, deployer: Deployer, ifExists: m.IF_EXISTS
   })
 }
 
-export function undeploy(client: Client, deployer: Deployer, model: m.Model): Promise<boolean> {
+export function undeploy(client: DatabaseClient, deployer: Deployer, model: m.Model): Promise<boolean> {
   let promises: Promise<boolean>[] = []
 
   v.visitModel({
@@ -301,7 +303,7 @@ function select() {
 }
 exports.select = select;`
 
-export function deployAssets(adminClient: Client, configClient: Client, createClient: (database: string) => Client, deployer: AssetDeployer, model: m.Model, assetModel: m.AssetModel): Promise<boolean> {
+export function deployAssets(adminClient: DatabaseClient, configClient: DatabaseClient, createClient: (database: string) => DatabaseClient, deployer: AssetDeployer, model: m.Model, assetModel: m.AssetModel): Promise<boolean> {
   let promises: Promise<boolean>[] = []
 
   if (assetModel.ruleSets) {
@@ -314,9 +316,9 @@ export function deployAssets(adminClient: Client, configClient: Client, createCl
   if (!assetModel.modules) {
     assetModel.modules = {}
   }
-  if (!assetModel.modules['markscript-core']) {
-    assetModel.modules['markscript-core'] = {
-      name: 'markscript-core',
+  if (!assetModel.modules['markscript-server']) {
+    assetModel.modules['markscript-server'] = {
+      name: 'markscript-server',
       code: markscriptCode
     }
   }
@@ -363,7 +365,7 @@ export function deployAssets(adminClient: Client, configClient: Client, createCl
   })
 }
 
-export function undeployAssets(client: Client, deployer: Deployer, model: m.Model): Promise<boolean> {
+export function undeployAssets(client: DatabaseClient, deployer: Deployer, model: m.Model): Promise<boolean> {
   let promise: Promise<boolean>
 
   v.visitModel({
@@ -371,10 +373,8 @@ export function undeployAssets(client: Client, deployer: Deployer, model: m.Mode
       let f = function(resolve, reject) {
         client.xqueryEval('xdmp:forest-clear(xdmp:database-forests(xdmp:database("' + database.name + '")))').result(function() {
           resolve(true)
-          return true
-        }).catch(function(e) {
+        }, function(e) {
           reject(e)
-          return e
         })
       }
 
@@ -409,40 +409,63 @@ function toModuleName(name: string) {
 }
 
 export class StandardAssetDeployer implements AssetDeployer {
-  deployRuleSet(client: Client, spec: m.RuleSetSpec): Promise<boolean> {
-    return a.createRuleSet(client, { path: spec.path }, spec.rules)
+  deployRuleSet(client: DatabaseClient, spec: m.RuleSetSpec): Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      client.documents.write({
+        uri: spec.path,
+        content: spec.rules
+      }).result(function() {
+        resolve(true)
+      }, reject)
+    })
   }
-  undeployRuleSet(client: Client, spec: m.RuleSetSpec): Promise<boolean> {
-    // TODO
-    return null
+  undeployRuleSet(client: DatabaseClient, spec: m.RuleSetSpec): Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      client.documents.remove(spec.path).result(function() {
+        resolve(true)
+      }, reject)
+    })
   }
 
-  deployModule(client: Client, spec: m.ModuleSpec): Promise<boolean> {
+  deployModule(client: DatabaseClient, spec: m.ModuleSpec): Promise<boolean> {
     let name = toModuleName(spec.name)
     if (!spec.code) {
       spec.code = '// EMPTY MODULE'
     }
-    return a.createDocument(client, { uri: toModuleName(name) }, normaliseRequires(spec.name, spec.code))
+    return new Promise(function(resolve, reject) {
+      client.config.extlibs.write({
+        path: name,
+        contentType: 'application/vnd.marklogic-javascript',
+        source: normaliseRequires(spec.name, spec.code)
+      }).result(function() {
+        resolve(true)
+      }, reject)
+    })
   }
-  undeployModule(client: Client, spec: m.ModuleSpec): Promise<boolean> {
-    // TODO
-    return null
-  }
-
-  deployExtension(client: Client, spec: m.ExtensionSpec): Promise<boolean> {
-    return a.installServiceResourceExtension(client, {
-      name: spec.name,
-      methods: {}, // TODO
-      description: '',
-      version: '1'
-    }, normaliseRequires(spec.name, spec.code))
-  }
-  undeployExtension(client: Client, spec: m.ExtensionSpec): Promise<boolean> {
-    // TODO
-    return null
+  undeployModule(client: DatabaseClient, spec: m.ModuleSpec): Promise<boolean> {
+    return new Promise(function(resolve, reject){
+      client.config.extlibs.remove(toModuleName(spec.name)).result(function() {
+        resolve(true)
+      }, reject)
+    })
   }
 
-  deployAlert(client: Client, spec: m.AlertSpec): Promise<boolean> {
+  deployExtension(client: DatabaseClient, spec: m.ExtensionSpec): Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      client.config.resources.write(spec.name, 'javascript', normaliseRequires(spec.name, spec.code)).result(function() {
+        resolve(true)
+      }, reject)
+    })
+  }
+  undeployExtension(client: DatabaseClient, spec: m.ExtensionSpec): Promise<boolean> {
+    return new Promise(function(resolve, reject){
+      client.config.resources.remove(spec.name).result(function() {
+        resolve(true)
+      }, reject)
+    })
+  }
+
+  deployAlert(client: DatabaseClient, spec: m.AlertSpec): Promise<boolean> {
     let states: string[]
     if (!spec.states) {
       states = ['create', 'modify']
@@ -466,7 +489,7 @@ export class StandardAssetDeployer implements AssetDeployer {
     } else {
       commit = 'post'
     }
-    return a.installAlert(client, {
+    return installAlert(client, {
       alertUri: spec.name,
       alertName: spec.name,
       actionName: spec.name + 'Action',
@@ -477,12 +500,11 @@ export class StandardAssetDeployer implements AssetDeployer {
       triggerDepth: spec.depth
     })
   }
-  undeployAlert(client: Client, spec: m.AlertSpec): Promise<boolean> {
-    // TODO
-    return null
+  undeployAlert(client: DatabaseClient, spec: m.AlertSpec): Promise<boolean> {
+    return deleteAlert(client, spec.name)
   }
 
-  deployTask(client: Client, spec: m.TaskSpec, model: m.Model): Promise<boolean> {
+  deployTask(client: DatabaseClient, spec: m.TaskSpec, model: m.Model): Promise<boolean> {
     let type: string
     switch (spec.type) {
       case m.FrequencyType.MINUTES:
@@ -507,14 +529,14 @@ export class StandardAssetDeployer implements AssetDeployer {
       'task-user': spec.user
     }, 'Default')
   }
-  undeployTask(client: Client, spec: m.TaskSpec): Promise<boolean> {
-    // TODO
-    return null
+
+  undeployTask(client: DatabaseClient, spec: m.TaskSpec): Promise<boolean> {
+    return a.deleteTask(client, toModuleName(spec.module))
   }
 }
 
 export class StandardDeployer implements Deployer {
-  deployDatabase(client: Client, ifExists: m.IF_EXISTS, database: m.DatabaseSpec): Promise<boolean> {
+  deployDatabase(client: DatabaseClient, ifExists: m.IF_EXISTS, database: m.DatabaseSpec): Promise<boolean> {
     function _createDatabase() {
       let databaseConfig: a.DatabaseConfiguration = {
         'database-name': database.name,
@@ -575,16 +597,16 @@ export class StandardDeployer implements Deployer {
     }, _createDatabase)
 
   }
-  cleanDatabase(client: Client, database: m.DatabaseSpec): Promise<boolean> {
+  cleanDatabase(client: DatabaseClient, database: m.DatabaseSpec): Promise<boolean> {
     return a.clearOrConfigureDatabase(client, database.name, new a.ClearDatabaseOperation())
   }
-  undeployDatabase(client: Client, database: m.DatabaseSpec): Promise<boolean> {
+  undeployDatabase(client: DatabaseClient, database: m.DatabaseSpec): Promise<boolean> {
     return a.deleteDatabase(client, database.name).then(function() {
       return true
     })
   }
 
-  deployForest(client: Client, ifExists: m.IF_EXISTS, forest: m.ForestSpec): Promise<boolean> {
+  deployForest(client: DatabaseClient, ifExists: m.IF_EXISTS, forest: m.ForestSpec): Promise<boolean> {
     function _createForest() {
       return a.createForest(client, {
         'forest-name': forest.name,
@@ -609,13 +631,13 @@ export class StandardDeployer implements Deployer {
     }, _createForest)
 
   }
-  undeployForest(client: Client, forest: m.ForestSpec): Promise<boolean> {
+  undeployForest(client: DatabaseClient, forest: m.ForestSpec): Promise<boolean> {
     return a.deleteForest(client, forest.name).then(function() {
       return true
     })
   }
 
-  deployServer(client: Client, ifExists: m.IF_EXISTS, server: m.ServerSpec): Promise<boolean> {
+  deployServer(client: DatabaseClient, ifExists: m.IF_EXISTS, server: m.ServerSpec): Promise<boolean> {
     function _createServer() {
       return a.createAppServer(client, {
         'server-name': server.name,
@@ -648,7 +670,7 @@ export class StandardDeployer implements Deployer {
       }
     }, _createServer)
   }
-  undeployServer(client: Client, server: m.ServerSpec): Promise<boolean> {
+  undeployServer(client: DatabaseClient, server: m.ServerSpec): Promise<boolean> {
     return a.deleteAppServer(client, server.name, server.group).then(function() {
       return true
     })
@@ -666,7 +688,7 @@ function toPromise(promises: Promise<boolean>[]) {
   })
 }
 
-function deployDatabase(client: Client, deployer: Deployer, ifExists: m.IF_EXISTS, database: m.DatabaseSpec) {
+function deployDatabase(client: DatabaseClient, deployer: Deployer, ifExists: m.IF_EXISTS, database: m.DatabaseSpec) {
   return deployer.deployDatabase(client, ifExists, database).then(function() {
     let promises = []
     database.forests.forEach(function(forest) {
@@ -676,7 +698,7 @@ function deployDatabase(client: Client, deployer: Deployer, ifExists: m.IF_EXIST
   })
 }
 
-function undeployDatabase(client: Client, deployer: Deployer, database: m.DatabaseSpec) {
+function undeployDatabase(client: DatabaseClient, deployer: Deployer, database: m.DatabaseSpec) {
   return deployer.undeployDatabase(client, database).then(function(result) {
     if (result) {
       let promises: Promise<boolean>[] = []

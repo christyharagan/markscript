@@ -54,10 +54,6 @@ export enum TRIGGER_STATE {
   CREATE, MODIFY, DELETE
 }
 
-// export interface MethodReference extends s.Reference {
-//   methodName: string
-// }
-
 export interface AlertSpec {
   name: string
   scope: string

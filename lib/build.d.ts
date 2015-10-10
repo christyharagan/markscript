@@ -26,7 +26,7 @@ export interface BuildOptions {
             [extensionName: string]: string;
         };
     };
-    middle: {
+    middle?: {
         host: string;
         port: number;
     };
