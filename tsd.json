@@ -5,23 +5,17 @@
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
+    "node/node.d.ts": {
+      "commit": "b27d0d0e1ce4207a7a5b1da847cb776c16d7531e"
+    },
     "mocha/mocha.d.ts": {
-      "commit": "101a5daef4fc42eca0d447ba5d080248f80daf90"
+      "commit": "b27d0d0e1ce4207a7a5b1da847cb776c16d7531e"
     },
     "should/should.d.ts": {
-      "commit": "101a5daef4fc42eca0d447ba5d080248f80daf90"
+      "commit": "b27d0d0e1ce4207a7a5b1da847cb776c16d7531e"
     },
     "should-promised/should-promised.d.ts": {
-      "commit": "101a5daef4fc42eca0d447ba5d080248f80daf90"
-    },
-    "glob/glob.d.ts": {
-      "commit": "de1bfe2c1de921da660cc17a5af1de6c095b35eb"
-    },
-    "minimatch/minimatch.d.ts": {
-      "commit": "de1bfe2c1de921da660cc17a5af1de6c095b35eb"
-    },
-    "node/node.d.ts": {
-      "commit": "d6c98baa7fd703e449cf37f3ec39ed3bd92cfd35"
+      "commit": "b27d0d0e1ce4207a7a5b1da847cb776c16d7531e"
     }
   }
 }

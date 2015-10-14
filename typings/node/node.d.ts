@@ -860,7 +860,7 @@ declare module "child_process" {
         env?: any;
         encoding?: string;
         timeout?: number;
-        maxBuffer?: string;
+        maxBuffer?: number;
         killSignal?: string;
     }, callback?: (error: Error, stdout: Buffer, stderr: Buffer) =>void ): ChildProcess;
     export function fork(modulePath: string, args?: string[], options?: {
@@ -868,6 +868,26 @@ declare module "child_process" {
         env?: any;
         encoding?: string;
     }): ChildProcess;
+    export function spawnSync(command: string, args?: string[], options?: {
+        cwd?: string;
+        input?: string | Buffer;
+        stdio?: any;
+        env?: any;
+        uid?: number;
+        gid?: number;
+        timeout?: number;
+        maxBuffer?: number;
+        killSignal?: string;
+        encoding?: string;
+    }): {
+        pid: number;
+        output: string[];
+        stdout: string | Buffer;
+        stderr: string | Buffer;
+        status: number;
+        signal: string;
+        error: Error;
+    };
     export function execSync(command: string, options?: {
         cwd?: string;
         input?: string|Buffer;
@@ -879,7 +899,7 @@ declare module "child_process" {
         maxBuffer?: number;
         killSignal?: string;
         encoding?: string;
-    }): ChildProcess;
+    }): string | Buffer;
     export function execFileSync(command: string, args?: string[], options?: {
         cwd?: string;
         input?: string|Buffer;
@@ -891,7 +911,7 @@ declare module "child_process" {
         maxBuffer?: number;
         killSignal?: string;
         encoding?: string;
-    }): ChildProcess;
+    }): string | Buffer;
 }
 
 declare module "url" {

@@ -31,8 +31,6 @@
         "src/lib/modelVisitor.ts",
         "src/test/admin/alert/installAndDeleteAlert.ts",
         "src/test/createTestClient.ts",
-        "typings/glob/glob.d.ts",
-        "typings/minimatch/minimatch.d.ts",
         "typings/mocha/mocha.d.ts",
         "typings/node/node.d.ts",
         "typings/promise/promise.d.ts",

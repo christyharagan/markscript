@@ -1,6 +1,5 @@
-require('should')
-require('should-promised')
-
+import 'should'
+import 'should-promised'
 import {createTestClient} from '../../createTestClient'
 import {getAlert} from '../../../lib/admin/alerts/getAlert'
 import {installAlert} from '../../../lib/admin/alerts/installAlert'
@@ -25,7 +24,7 @@ describe('install and delete an alert', function() {
     return createANewAleart().catch(function(e) {
       console.log(e)
       throw e
-    }).should.be.fulfilled
+    }).should.be.fulfilled()
   })
 })
 
@@ -37,13 +36,15 @@ export function createANewAleart() {
     clientClient.config.resources.read(CREATE_TEST_DOC).result(function() {
       reject('Test Module should not exist before calling tests')
     }, resolve)
-  }).then(function() {
+  }).then(function(e:{statusCode:number}) {
+    e.statusCode.should.equal(404)
     return new Promise(function(resolve, reject) {
       clientClient.documents.read(TEST_DOC_1).result(function() {
         reject('Test Document should not exist before calling tests')
       }, resolve)
     })
-  }).then(function() {
+  }).then(function(e:{statusCode:number}) {
+    e.statusCode.should.equal(404)
     return new Promise(function(resolve, reject) {
       clientClient.documents.read(TEST_DOC_2).result(function() {
         reject('Test Document should not exist before calling tests')

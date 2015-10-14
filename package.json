@@ -1,6 +1,6 @@
 {
   "name": "markscript-core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A library for building JavaScript or TypeScript projects with MarkLogic.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -32,8 +32,8 @@
     "yargs": "^3.22.2"
   },
   "devDependencies": {
-    "mocha": "^2.2.5",
-    "should": "^6.0.3",
-    "should-promised": "^0.2.1"
+    "mocha": "^2.3.3",
+    "should": "^7.1.0",
+    "should-promised": "^0.3.1"
   }
 }
