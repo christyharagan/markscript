@@ -14,17 +14,32 @@
         "tabSize": 2
     },
     "compileOnSave": true,
-    "exclude": [
-      "node_modules/.bin",
-      "node_modules/babel",
-      "node_modules/glob",
-      "node_modules/marklogic",
-      "node_modules/marklogic-node-typescript-definitions/typings",
-      "node_modules/ml-admin",
-      "node_modules/resolve",
-      "node_modules/typescript",
-      "node_modules/typescript-package",
-      "node_modules/typescript-schema",
-      "examples"
-    ]
+    "filesGlob": [
+        "build.d.t",
+        "src/**/*.ts",
+        "typings/**/*.d.ts",
+        "node_modules/marklogic-node-typescript-definitions/ts/index.d.ts"
+    ],
+    "files": [
+        "src/lib/admin/alerts/deleteAlert.ts",
+        "src/lib/admin/alerts/getAlert.ts",
+        "src/lib/admin/alerts/installAlert.ts",
+        "src/lib/build.ts",
+        "src/lib/deployer.ts",
+        "src/lib/index.ts",
+        "src/lib/model.ts",
+        "src/lib/modelVisitor.ts",
+        "src/test/admin/alert/installAndDeleteAlert.ts",
+        "src/test/createTestClient.ts",
+        "typings/glob/glob.d.ts",
+        "typings/minimatch/minimatch.d.ts",
+        "typings/mocha/mocha.d.ts",
+        "typings/node/node.d.ts",
+        "typings/promise/promise.d.ts",
+        "typings/should-promised/should-promised.d.ts",
+        "typings/should/should.d.ts",
+        "typings/tsd.d.ts",
+        "node_modules/marklogic-node-typescript-definitions/ts/index.d.ts"
+    ],
+    "exclude": []
 }

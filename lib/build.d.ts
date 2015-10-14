@@ -1,49 +1,57 @@
-import * as s from 'typescript-schema';
 import * as m from './model';
-export interface Plugin<Options> {
-    generateModel(databaseModel: m.Model & m.AssetModel, pluginOptions?: Options, options?: BuildOptions): any;
-    serialiseModel(databaseModel: m.Model & m.AssetModel, pluginOptions?: Options, options?: BuildOptions): {
-        [modelName: string]: string;
-    };
+import * as s from 'typescript-schema';
+import { DatabaseClient } from 'marklogic';
+export interface BuildModelPlugin<O, M> {
+    generate(buildModel: BuildModel, options: BuildConfig & O, typeModel?: s.KeyValue<s.reflective.Module>): BuildModel & M;
+    jsonify?(buildModel: M): any;
+    dejsonify?(jsonifiedModel: any): M;
 }
-export declare type PluginAndOptions<Options> = [Plugin<Options>, Options];
-export interface BuildOptions {
+export declare type TypeModel = s.KeyValue<s.reflective.Module>;
+export declare type BuildModel = m.Model & m.AssetModel & {
+    typeModel?: TypeModel;
+};
+export declare type Task<S extends Server> = ((buildModel: BuildModel, buildConfig: BuildConfig, server: S) => void) & {
+    requiresFreshModel?: boolean;
+};
+export interface Server {
+    getClient(portOrDatabase?: number | string): DatabaseClient;
+}
+export interface ServerConstructor<S extends Server> {
+    new (buildModel: BuildModel, buildConfig: BuildConfig, pkgDir?: string): S;
+}
+export interface BuildConfig {
     database: {
         host: string;
         httpPort: number;
         adminPort?: number;
         configPort?: number;
         user: string;
-        password: string;
-        modelObject?: Object;
-        model?: m.Model & m.AssetModel;
-        defaultTaskUser?: string;
-        modules?: string | string[];
-        ruleSets?: m.RuleSetSpec[];
-        tasks?: m.TaskSpec[];
-        alerts?: m.AlertSpec[];
-        extensions?: {
-            [extensionName: string]: string;
-        };
+        password?: string;
     };
-    middle?: {
-        host: string;
-        port: number;
-    };
-    plugins?: {
-        [pluginName: string]: PluginAndOptions<any>;
-    };
-    pkgDir?: string;
+}
+export declare enum BuildModelPersistance {
+    NONE = 0,
+    NO_SOURCE = 1,
+    ALL = 2,
+}
+export interface BuildOptions {
+    buildConfig: BuildConfig;
+    pkgDir: string;
+    isTypeScript?: boolean;
+    plugins: BuildModelPlugin<any, any>[];
+    server?: ServerConstructor<any>;
+    tasks?: Task<any>[];
     typeModel?: s.KeyValue<s.reflective.Module>;
+    buildModelPersistance?: BuildModelPersistance;
+    buildModelPersistanceFolder?: string;
 }
 export declare class Build {
-    protected options: BuildOptions;
+    options: BuildOptions;
     constructor(options: BuildOptions);
-    loadModel(dirName?: string): void;
-    writeModel(dirName?: string): void;
-    buildModel(): void;
-    createDatabase(): Promise<boolean>;
-    removeDatabase(): Promise<boolean>;
-    deployAssets(): Promise<boolean>;
-    undeployAssets(): Promise<boolean>;
+    runTasks(names: string | string[]): void;
+}
+export declare class CoreServer implements Server {
+    buildConfig: BuildConfig;
+    constructor(buildModel: BuildModel, buildConfig: BuildConfig);
+    getClient(portOrDatabase?: number | string): DatabaseClient;
 }

@@ -20,4 +20,4 @@ npm install markscript-core
 
 Basic Usage:
 
-See the examples folder.
+See the [examples projects](https://github.com/christyharagan/markscript-examples).

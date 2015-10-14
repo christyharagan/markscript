@@ -1,253 +1,244 @@
-// TODO: Currently, the logic doesn't work well when chaining commands together (e.g. for a redeploy)
-
-import * as s from 'typescript-schema'
-import * as p from 'typescript-package'
-import * as a from 'ml-admin'
-import * as path from 'path'
-import * as fs from 'fs'
-import * as glob from 'glob'
 import * as m from './model'
 import * as d from './deployer'
-import * as mg from './modelGenerator'
-import {ConnectionParams, createDatabaseClient} from 'marklogic'
+import * as s from 'typescript-schema'
+import * as p from 'typescript-package'
+import {DatabaseClient, createDatabaseClient} from 'marklogic'
+import * as path from 'path'
+import * as fs from 'fs'
 
-let resolve = require('resolve')
+export interface BuildModelPlugin<O, M> {
+  generate(buildModel: BuildModel, options: BuildConfig & O, typeModel?: s.KeyValue<s.reflective.Module>): BuildModel & M
+  jsonify?(buildModel: M): any
+  dejsonify?(jsonifiedModel: any): M
+}
+export type TypeModel = s.KeyValue<s.reflective.Module>
+export type BuildModel = m.Model & m.AssetModel & {
+  typeModel?: TypeModel
+}
+export type Task<S extends Server> = ((buildModel: BuildModel, buildConfig: BuildConfig, server: S) => void) & { requiresFreshModel?: boolean }
 
-export interface Plugin<Options> {
-  generateModel(databaseModel: m.Model&m.AssetModel, pluginOptions?: Options, options?: BuildOptions)
-  serialiseModel(databaseModel: m.Model&m.AssetModel, pluginOptions?: Options, options?: BuildOptions): { [modelName: string]: string }
+export interface Server {
+  getClient(portOrDatabase?: number | string): DatabaseClient
 }
 
-export type PluginAndOptions<Options> = [Plugin<Options>, Options]
+export interface ServerConstructor<S extends Server> {
+  new (buildModel: BuildModel, buildConfig: BuildConfig, pkgDir?: string): S
+}
 
-export interface BuildOptions {
+export interface BuildConfig {
   database: {
     host: string
     httpPort: number
     adminPort?: number
     configPort?: number
     user: string
-    password: string
-    modelObject?: Object
-    model?: m.Model&m.AssetModel
-    defaultTaskUser?: string
+    password?: string
+  }
+}
 
-    modules?: string | string[]
-    ruleSets?: m.RuleSetSpec[]
-    tasks?: m.TaskSpec[]
-    alerts?: m.AlertSpec[]
-    extensions?: { [extensionName: string]: string }
-  }
-  middle?: {
-    host: string
-    port: number
-  }
-  plugins?: { [pluginName: string]: PluginAndOptions<any> },
-  pkgDir?: string,
+export enum BuildModelPersistance {
+  NONE,
+  NO_SOURCE,
+  ALL
+}
+export interface BuildOptions {
+  buildConfig: BuildConfig
+  pkgDir: string
+  isTypeScript?: boolean
+  plugins: BuildModelPlugin<any, any>[]
+  server?: ServerConstructor<any>
+  tasks?: Task<any>[]
   typeModel?: s.KeyValue<s.reflective.Module>
+  buildModelPersistance?: BuildModelPersistance
+  buildModelPersistanceFolder?: string
 }
 
 export class Build {
-  protected options: BuildOptions
+  options: BuildOptions
 
   constructor(options: BuildOptions) {
     this.options = options
   }
-
-  loadModel(dirName?: string) {
-    if (!dirName && !this.options.pkgDir) {
-      throw new Error('To load the database model, either a file name must be provided, or a pkg directory to read a database-model.json file from')
+  runTasks(names: string | string[]) {
+    let persistsModel = this.options.buildModelPersistance === BuildModelPersistance.NO_SOURCE || this.options.buildModelPersistance === BuildModelPersistance.ALL
+    let persistedModelFileName: string
+    if (persistsModel) {
+      let dirName = path.join(this.options.pkgDir, this.options.buildModelPersistanceFolder || 'deployed')
+      if (!fs.existsSync(dirName)) {
+        fs.mkdirSync(dirName)
+      }
+      persistedModelFileName = path.join(dirName, 'build-model.json')
     }
-    dirName = dirName || this.options.pkgDir
-    let fileName = path.join(dirName, 'database-model.json')
-    if (!fs.existsSync(fileName)) {
-      throw new Error('The database model file "' + fileName + '" does not exist')
-    }
-    this.options.database.model = JSON.parse(fs.readFileSync(fileName).toString())
-  }
 
-  writeModel(dirName?: string) {
-    this.buildModel()
     let self = this
-    if (!dirName && !this.options.pkgDir) {
-      throw new Error('To write the database model, either a file name must be provided, or a pkg directory to read a database-model.json file from')
-    }
-    dirName = dirName || path.join(this.options.pkgDir, 'deployed')
+    let buildModel: BuildModel
+    let server: Server
 
-    let model: m.Model&m.AssetModel = {
-      databases: {},
-      servers: {},
-      ruleSets: [],
-      modules: {},
-      extensions: {},
-      tasks: {},
-      alerts: {}
+    if (!Array.isArray(names)) {
+      names = [<string>names]
     }
+    (<string[]>names).forEach(function(name) {
+      let task = getTask(name)
+      let rebuildServer = false
 
-    if (this.options.database.model.databases) {
-      model.databases = this.options.database.model.databases
-    }
-    if (this.options.database.model.servers) {
-      model.servers = this.options.database.model.servers
-    }
-    if (this.options.database.model.tasks) {
-      model.tasks = this.options.database.model.tasks
-    }
-    if (this.options.database.model.alerts) {
-      model.alerts = this.options.database.model.alerts
-    }
-    if (this.options.database.model.ruleSets) {
-      model.ruleSets = this.options.database.model.ruleSets
-    }
-    model.contentDatabase = this.options.database.model.contentDatabase
-    model.modulesDatabase = this.options.database.model.modulesDatabase
-    model.securityDatabase = this.options.database.model.securityDatabase
-    model.schemaDatabase = this.options.database.model.schemaDatabase
-    model.triggersDatabase = this.options.database.model.triggersDatabase
-
-    if (this.options.database.model.modules) {
-      Object.keys(this.options.database.model.modules).forEach(function(name) {
-        model.modules[name] = { name: name, code: '' }
-      })
-    }
-    if (this.options.database.model.extensions) {
-      Object.keys(this.options.database.model.extensions).forEach(function(name) {
-        model.extensions[name] = { name: name, code: '' }
-      })
-    }
-
-    if (!fs.existsSync(dirName)) {
-      fs.mkdirSync(dirName)
-    }
-    fs.writeFileSync(path.join(dirName, 'database-model.json'), JSON.stringify(model, null, '  '))
-
-    if (this.options.plugins) {
-      Object.keys(this.options.plugins).forEach(function(name) {
-        let [plugin, pluginOptions] = self.options.plugins[name]
-        let serialisedModels = plugin.serialiseModel(self.options.database.model, pluginOptions, self.options)
-        Object.keys(serialisedModels).forEach(function(modelName) {
-          fs.writeFileSync(path.join(dirName, modelName + '.json'), serialisedModels[modelName])
-        })
-      })
-    }
-  }
-
-  buildModel() {
-    let self = this
-    if (!this.options.database.model) {
-      if (this.options.database.modelObject) {
-        if (!this.options.typeModel && !this.options.pkgDir) {
-          throw new Error('To build the database model, either a type model must be provided, or a package directory from which to generate one')
+      if (!buildModel && !task.requiresFreshModel && persistedModelFileName && fs.existsSync(persistedModelFileName)) {
+        buildModel = deserialiseBuildModel(fs.readFileSync(persistedModelFileName).toString(), self.options.plugins)
+        rebuildServer = true
+      } else if (!buildModel || task.requiresFreshModel) {
+        let typeModel: s.KeyValue<s.reflective.Module> = self.options.typeModel
+        if (!typeModel && self.options.isTypeScript) {
+          let rawPackage: s.PackageFactory = p.packageAstToFactory(self.options.pkgDir)
+          typeModel = rawPackage.construct(s.factoryToReflective())().modules
         }
+        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, typeModel)
 
-        if (!this.options.typeModel) {
-          let rawPackage: s.PackageFactory = p.packageAstToFactory(this.options.pkgDir)
-          this.options.typeModel = rawPackage.construct(s.factoryToReflective())().modules
+        if (persistsModel) {
+          fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildModelPersistance))
         }
-
-        this.options.database.model = mg.generateModel(this.options.typeModel, this.options.database.modelObject, this.options.database.host)
-        mg.generateAssetModel(this.options.typeModel, this.options.database.modelObject, this.options.database.model, this.options.database.defaultTaskUser || this.options.database.user)
-      } else {
-        if (!fs.existsSync(path.join(this.options.pkgDir, 'database-model.json'))) {
-          throw new Error('To build, a database-model.json file is required to exist in the package directory, or a database model object provided')
-        }
-        this.options.database.model = JSON.parse(fs.readFileSync(path.join(this.options.pkgDir, 'database-model.json')).toString())
+        rebuildServer = true
       }
-    }
 
-    if (this.options.database.modules) {
-      if (Array.isArray(this.options.database.modules)) {
-        if (!this.options.pkgDir) {
-          throw new Error('To load modules, a package directory must be specified')
-        }
-        mg.addModules(this.options.database.model, this.options.pkgDir, <string[]>this.options.database.modules)
-      } else if (typeof this.options.database.modules === 'string') {
-        if (!this.options.pkgDir) {
-          throw new Error('To load modules, a package directory must be specified')
-        }
-        mg.addModules(this.options.database.model, this.options.pkgDir, glob.sync(<string>this.options.database.modules, { cwd: this.options.pkgDir }))
+      if (rebuildServer) {
+        server = new self.options.server(buildModel, self.options.buildConfig, self.options.pkgDir)
       }
-    }
-    if (this.options.database.extensions) {
-      mg.addExtensions(this.options.database.model, this.options.pkgDir, this.options.database.extensions)
-    }
-    if (this.options.database.tasks) {
-      if (!this.options.database.model.tasks) {
-        this.options.database.model.tasks = {}
-      }
-      this.options.database.tasks.forEach(function(taskSpec) {
-        self.options.database.model.tasks[taskSpec.name] = taskSpec
-      })
-    }
-    if (this.options.database.alerts) {
-      if (!this.options.database.model.alerts) {
-        this.options.database.model.alerts = {}
-      }
-      this.options.database.alerts.forEach(function(alertSpec) {
-        self.options.database.model.alerts[alertSpec.name] = alertSpec
-      })
-    }
-    if (this.options.database.ruleSets) {
-      if (!this.options.database.model.ruleSets) {
-        this.options.database.model.ruleSets = []
-      }
-      this.options.database.ruleSets.forEach(function(ruleSetSpec) {
-        self.options.database.model.ruleSets.push(ruleSetSpec)
-      })
-    }
 
-    if (this.options.plugins) {
-      Object.keys(this.options.plugins).forEach(function(name) {
-        let [plugin, pluginOptions] = self.options.plugins[name]
-        plugin.generateModel(self.options.database.model, pluginOptions, self.options)
-      })
-    }
-  }
-
-  createDatabase(): Promise<boolean> {
-    this.buildModel()
-    let configClient = getClient(this.options, this.options.database.configPort)
-    return d.deploy(configClient, new d.StandardDeployer(), m.IF_EXISTS.clear, this.options.database.model)
-  }
-
-  removeDatabase(): Promise<boolean> {
-    if (!this.options.database.model) {
-      if (this.options.pkgDir && fs.existsSync(path.join(this.options.pkgDir, 'deployed', 'database-model.json'))) {
-        this.options.database.model = JSON.parse(fs.readFileSync(path.join(this.options.pkgDir, 'deployed', 'database-model.json')).toString())
-      } else {
-        this.buildModel()
-      }
-    }
-    return d.undeploy(getClient(this.options, this.options.database.configPort), new d.StandardDeployer(), this.options.database.model)
-  }
-
-  deployAssets(): Promise<boolean> {
-    this.buildModel()
-    let self = this
-    return d.deployAssets(getClient(this.options, this.options.database.adminPort), getClient(this.options, this.options.database.configPort), function(database) {
-      return getClient(self.options, self.options.database.httpPort, database)
-    }, new d.StandardAssetDeployer(), this.options.database.model, this.options.database.model)
-  }
-
-  undeployAssets(): Promise<boolean> {
-    if (!this.options.database.model) {
-      if (this.options.pkgDir && fs.existsSync(path.join(this.options.pkgDir, 'deployed', 'database-model.json'))) {
-        this.options.database.model = JSON.parse(fs.readFileSync(path.join(this.options.pkgDir, 'deployed', 'database-model.json')).toString())
-      } else {
-        this.buildModel()
-      }
-    }
-    return d.undeployAssets(getClient(this.options, this.options.database.httpPort), new d.StandardDeployer(), this.options.database.model)
+      task(buildModel, self.options.buildConfig, server)
+    })
   }
 }
 
-function getClient(options: BuildOptions, port: number, database?: string) {
-  let params: ConnectionParams = {
-    host: options.database.host,
-    port: port,
-    user: options.database.user,
-    password: options.database.password,
-    database: database || 'Documents'
+function getTask(taskName: string, tasks?: Task<any>[]): Task<any> {
+  if (tasks && tasks[name]) {
+    return tasks[name]
+  } else {
+    name = name.toLowerCase()
+    switch (name) {
+      case 'create':
+        return createTask
+      case 'remove':
+        return removeTask
+      case 'deploy':
+        return deployTask
+      case 'undeploy':
+        return undeployTask
+    }
   }
-  return createDatabaseClient(params)
+}
+
+function createTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
+  let configClient = server.getClient(buildConfig.database.configPort || 8002)
+  return d.deploy(configClient, new d.StandardDeployer(), m.IF_EXISTS.clear, buildModel)
+}
+(<Task<any>>createTask).requiresFreshModel = true
+
+function removeTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
+  let configClient = server.getClient(buildConfig.database.configPort || 8002)
+  return d.undeploy(configClient, new d.StandardDeployer(), buildModel)
+}
+
+function deployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
+  let adminClient = server.getClient(buildConfig.database.adminPort || 8001)
+  let configClient = server.getClient(buildConfig.database.configPort || 8002)
+  return d.deployAssets(adminClient, configClient, function(database) {
+    return server.getClient(database)
+  }, new d.StandardAssetDeployer(), buildModel, buildModel)
+}
+(<Task<any>>deployTask).requiresFreshModel = true
+
+function undeployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
+  let client = server.getClient(buildConfig.database.httpPort || 8000)
+  return d.undeployAssets(client, new d.StandardDeployer(), this.options.database.model)
+}
+
+export class CoreServer implements Server {
+  buildConfig: BuildConfig
+  constructor(buildModel: BuildModel, buildConfig: BuildConfig) {
+    this.buildConfig = buildConfig
+  }
+
+  getClient(portOrDatabase?: number | string): DatabaseClient {
+    return createDatabaseClient({
+      host: this.buildConfig.database.host,
+      port: typeof portOrDatabase === 'string' ? 8000 : <number>portOrDatabase,
+      user: this.buildConfig.database.user,
+      password: this.buildConfig.database.password,
+      database: typeof portOrDatabase === 'string' ? <string>portOrDatabase : 'Documents'
+    })
+  }
+}
+
+function serialiseBuildModel(buildModel: BuildModel, plugins: BuildModelPlugin<any, any>[], buildModelPersistance: BuildModelPersistance): string {
+  let serialisable: any = {
+    databases: buildModel.databases,
+    servers: buildModel.servers,
+    ruleSets: buildModel.ruleSets,
+    tasks: buildModel.tasks,
+    alerts: buildModel.alerts
+  }
+  if (buildModelPersistance === BuildModelPersistance.ALL) {
+    serialisable.modules = buildModel.modules
+    serialisable.extensions = buildModel.extensions
+  } else {
+    serialisable.modules = {}
+    serialisable.extensions = {}
+    Object.keys(buildModel.modules).forEach(function(name) {
+      serialisable.modules[name] = { name: name, code: '' }
+    })
+    Object.keys(buildModel.extensions).forEach(function(name) {
+      serialisable.extensions[name] = { name: name, code: '' }
+    })
+  }
+
+  plugins.forEach(function(plugin) {
+    if (plugin.jsonify) {
+      let s = plugin.jsonify(buildModel)
+      Object.keys(s).forEach(function(key) {
+        serialisable[key] = s[key]
+      })
+    }
+  })
+
+  return JSON.stringify(serialisable)
+}
+
+function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlugin<any, any>[]): BuildModel {
+  let serialisable = JSON.parse(buildModelString)
+  let buildModel: BuildModel = {
+    databases: serialisable.databases,
+    servers: serialisable.servers,
+    ruleSets: serialisable.ruleSets,
+    modules: serialisable.modules,
+    extensions: serialisable.extensions,
+    tasks: serialisable.tasks,
+    alerts: serialisable.alerts
+  }
+
+  plugins.forEach(function(plugin) {
+    if (plugin.dejsonify) {
+      let s = plugin.dejsonify(buildModelString)
+      Object.keys(s).forEach(function(key) {
+        buildModel[key] = s[key]
+      })
+    }
+  })
+
+  return buildModel
+}
+
+function generateBuildModel(buildConfig: BuildConfig, plugins: BuildModelPlugin<any, any>[], typeModel?: s.KeyValue<s.reflective.Module>) {
+  let buildModel: BuildModel = {
+    databases: {},
+    servers: {},
+    ruleSets: [],
+    modules: {},
+    extensions: {},
+    tasks: {},
+    alerts: {}
+  }
+
+  plugins.forEach(function(plugin) {
+    buildModel = plugin.generate(buildModel, buildConfig, typeModel)
+  })
+
+  return buildModel
 }
