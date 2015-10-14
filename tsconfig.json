@@ -15,12 +15,13 @@
     },
     "compileOnSave": true,
     "filesGlob": [
-        "build.d.t",
+        "build.d.ts",
         "src/**/*.ts",
         "typings/**/*.d.ts",
         "node_modules/marklogic-node-typescript-definitions/ts/index.d.ts"
     ],
     "files": [
+        "build.d.ts",
         "src/lib/admin/alerts/deleteAlert.ts",
         "src/lib/admin/alerts/getAlert.ts",
         "src/lib/admin/alerts/installAlert.ts",

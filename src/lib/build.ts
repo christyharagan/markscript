@@ -24,7 +24,7 @@ export interface ServerConstructor<S extends Server> {
 }
 
 export interface BuildConfig {
-  database: {
+  databaseConnection: {
     host: string
     httpPort: number
     adminPort?: number
@@ -88,7 +88,7 @@ export class Build {
           let rawPackage: s.PackageFactory = p.packageAstToFactory(self.options.pkgDir)
           typeModel = rawPackage.construct(s.factoryToReflective())().modules
         }
-        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, typeModel)
+        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, typeModel)
 
         if (persistsModel) {
           fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildModelPersistance))
@@ -124,19 +124,19 @@ function getTask(taskName: string, tasks?: Task<any>[]): Task<any> {
 }
 
 function createTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let configClient = server.getClient(buildConfig.database.configPort || 8002)
+  let configClient = server.getClient(buildConfig.databaseConnection.configPort || 8002)
   return d.deploy(configClient, new d.StandardDeployer(), m.IF_EXISTS.clear, buildModel)
 }
 (<Task<any>>createTask).requiresFreshModel = true
 
 function removeTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let configClient = server.getClient(buildConfig.database.configPort || 8002)
+  let configClient = server.getClient(buildConfig.databaseConnection.configPort || 8002)
   return d.undeploy(configClient, new d.StandardDeployer(), buildModel)
 }
 
 function deployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let adminClient = server.getClient(buildConfig.database.adminPort || 8001)
-  let configClient = server.getClient(buildConfig.database.configPort || 8002)
+  let adminClient = server.getClient(buildConfig.databaseConnection.adminPort || 8001)
+  let configClient = server.getClient(buildConfig.databaseConnection.configPort || 8002)
   return d.deployAssets(adminClient, configClient, function(database) {
     return server.getClient(database)
   }, new d.StandardAssetDeployer(), buildModel, buildModel)
@@ -144,7 +144,7 @@ function deployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Se
 (<Task<any>>deployTask).requiresFreshModel = true
 
 function undeployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let client = server.getClient(buildConfig.database.httpPort || 8000)
+  let client = server.getClient(buildConfig.databaseConnection.httpPort || 8000)
   return d.undeployAssets(client, new d.StandardDeployer(), this.options.database.model)
 }
 
@@ -156,10 +156,10 @@ export class CoreServer implements Server {
 
   getClient(portOrDatabase?: number | string): DatabaseClient {
     return createDatabaseClient({
-      host: this.buildConfig.database.host,
+      host: this.buildConfig.databaseConnection.host,
       port: typeof portOrDatabase === 'string' ? 8000 : <number>portOrDatabase,
-      user: this.buildConfig.database.user,
-      password: this.buildConfig.database.password,
+      user: this.buildConfig.databaseConnection.user,
+      password: this.buildConfig.databaseConnection.password,
       database: typeof portOrDatabase === 'string' ? <string>portOrDatabase : 'Documents'
     })
   }
@@ -223,7 +223,7 @@ function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlug
   return buildModel
 }
 
-function generateBuildModel(buildConfig: BuildConfig, plugins: BuildModelPlugin<any, any>[], typeModel?: s.KeyValue<s.reflective.Module>) {
+function generateBuildModel(buildConfig: BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir:string, typeModel: s.KeyValue<s.reflective.Module>) {
   let buildModel: BuildModel = {
     databases: {},
     servers: {},
@@ -235,7 +235,7 @@ function generateBuildModel(buildConfig: BuildConfig, plugins: BuildModelPlugin<
   }
 
   plugins.forEach(function(plugin) {
-    buildModel = plugin.generate(buildModel, buildConfig, typeModel)
+    buildModel = plugin.generate(buildModel, buildConfig, pkgDir, typeModel)
   })
 
   return buildModel

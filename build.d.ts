@@ -1,5 +1,5 @@
 declare interface BuildConfig {
-  database: {
+  databaseConnection: {
     host: string
     httpPort: number
     adminPort?: number

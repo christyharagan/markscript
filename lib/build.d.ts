@@ -18,7 +18,7 @@ export interface ServerConstructor<S extends Server> {
     new (buildModel: BuildModel, buildConfig: BuildConfig, pkgDir?: string): S;
 }
 export interface BuildConfig {
-    database: {
+    databaseConnection: {
         host: string;
         httpPort: number;
         adminPort?: number;
