@@ -7,7 +7,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 
 export interface BuildModelPlugin<O, M> {
-  generate(buildModel: BuildModel, options: BuildConfig & O, typeModel?: s.KeyValue<s.reflective.Module>, pkgDir?:string): BuildModel & M
+  generate(buildModel: BuildModel, options: BuildConfig & O, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>): BuildModel & M
   jsonify?(buildModel: M): any
   dejsonify?(jsonifiedModel: any): M
 }

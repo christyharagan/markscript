@@ -2,7 +2,7 @@ import * as m from './model';
 import * as s from 'typescript-schema';
 import { DatabaseClient } from 'marklogic';
 export interface BuildModelPlugin<O, M> {
-    generate(buildModel: BuildModel, options: BuildConfig & O, typeModel?: s.KeyValue<s.reflective.Module>, pkgDir?: string): BuildModel & M;
+    generate(buildModel: BuildModel, options: BuildConfig & O, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>): BuildModel & M;
     jsonify?(buildModel: M): any;
     dejsonify?(jsonifiedModel: any): M;
 }
