@@ -7,9 +7,7 @@ export interface BuildModelPlugin<O, M> {
     dejsonify?(jsonifiedModel: any): M;
 }
 export declare type TypeModel = s.KeyValue<s.reflective.Module>;
-export declare type BuildModel = m.Model & m.AssetModel & {
-    typeModel?: TypeModel;
-};
+export declare type BuildModel = m.Model & m.AssetModel;
 export declare type Task<S extends Server> = ((buildModel: BuildModel, buildConfig: BuildConfig, server: S) => void) & {
     requiresFreshModel?: boolean;
 };
