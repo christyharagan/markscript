@@ -1,4 +1,3 @@
-//import * as m from './model'
 import * as s from 'typescript-schema'
 import * as p from 'typescript-package'
 import {DatabaseClient} from 'marklogic'
@@ -12,42 +11,9 @@ export interface BuildModelPlugin<C, M> {
   tasks?: {[name:string]:MarkScript.Task}
 }
 export type TypeModel = s.KeyValue<s.reflective.Module>
-//export type BuildModel = m.Model & m.AssetModel
-// export interface Task<R extends Runtime> {
-//   execute(buildModel?: MarkScript.BuildModel, buildConfig?: BuildConfig, runtime?: R):void
-//   description?: string
-//   requiresFreshModel?: boolean
-// }
-
-
-// export interface Runtime {
-//   //getClient(portOrDatabase?: number | string): DatabaseClient
-// }
-
-// export interface RuntimeConstructor<S extends Runtime> {
-//   new (buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?: string): S
-// }
-
-// export interface BuildConfig {
-//   databaseConnection: {
-//     host: string
-//     httpPort: number
-//     adminPort?: number
-//     configPort?: number
-//     user: string
-//     password?: string
-//   }
-//   buildModelPersistance?: BuildModelPersistance
-// }
 
 export interface BuildOptions extends MarkScript.Build {
-  // buildConfig: BuildConfig
-  // pkgDir: string
   plugins: BuildModelPlugin<any, any>[]
-  // runtime: RuntimeConstructor
-//  tasks?: {[name:string]:Task}
-//  buildModelPersistanceFolder?: string
-
   isTypeScript?: boolean
   typeModel?: s.KeyValue<s.reflective.Module>
 }
