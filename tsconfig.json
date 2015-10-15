@@ -24,7 +24,7 @@
     "files": [
         "model.d.ts",
         "build.d.ts",
-        "src/bin/cli.ts",
+        "src/bin/markscript.ts",
         "src/lib/admin/alerts/deleteAlert.ts",
         "src/lib/admin/alerts/getAlert.ts",
         "src/lib/admin/alerts/installAlert.ts",
