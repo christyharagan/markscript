@@ -1,6 +1,5 @@
-import * as m from './model';
 export interface ModelVisitor {
-    onDatabase?(database: m.DatabaseSpec): void;
-    onServer?(server: m.ServerSpec): void;
+    onDatabase?(database: MarkScript.DatabaseSpec): void;
+    onServer?(server: MarkScript.ServerSpec): void;
 }
-export declare function visitModel(modelVisitor: ModelVisitor, model: m.Model): void;
+export declare function visitModel(modelVisitor: ModelVisitor, model: MarkScript.Model): void;

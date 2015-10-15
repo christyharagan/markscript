@@ -1,18 +1,16 @@
-import * as m from './model'
-
 export interface ModelVisitor {
-  onDatabase?(database:m.DatabaseSpec):void
+  onDatabase?(database: MarkScript.DatabaseSpec): void
 
-  onServer?(server:m.ServerSpec):void
+  onServer?(server: MarkScript.ServerSpec): void
 }
 
-export function visitModel(modelVisitor: ModelVisitor, model:m.Model) {
+export function visitModel(modelVisitor: ModelVisitor, model: MarkScript.Model) {
   interface Seen {
-    [name:string]:boolean
+    [name: string]: boolean
   }
-  let seen:Seen = {}
+  let seen: Seen = {}
 
-  function handleDatabase(name:string) {
+  function handleDatabase(name: string) {
     if (!seen[name]) {
       seen[name] = true
       let database = model.databases[name]
@@ -33,7 +31,7 @@ export function visitModel(modelVisitor: ModelVisitor, model:m.Model) {
     Object.keys(model.databases).forEach(handleDatabase)
   }
   if (modelVisitor.onServer) {
-    Object.keys(model.servers).forEach(function(name){
+    Object.keys(model.servers).forEach(function(name) {
       modelVisitor.onServer(model.servers[name])
     })
   }

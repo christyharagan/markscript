@@ -16,6 +16,9 @@
     },
     "should-promised/should-promised.d.ts": {
       "commit": "b27d0d0e1ce4207a7a5b1da847cb776c16d7531e"
+    },
+    "yargs/yargs.d.ts": {
+      "commit": "3a6e1b8988eba0ba74fe4db20c950242552857e2"
     }
   }
 }

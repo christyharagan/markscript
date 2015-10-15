@@ -1,64 +1,80 @@
-import * as m from './model'
-import * as d from './deployer'
+//import * as m from './model'
 import * as s from 'typescript-schema'
 import * as p from 'typescript-package'
-import {DatabaseClient, createDatabaseClient} from 'marklogic'
+import {DatabaseClient} from 'marklogic'
 import * as path from 'path'
 import * as fs from 'fs'
 
-export interface BuildModelPlugin<O, M> {
-  generate(buildModel: BuildModel, options: BuildConfig & O, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>): BuildModel & M
-  jsonify?(buildModel: M): any
+export interface BuildModelPlugin<C, M> {
+  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M
+  jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>): any
   dejsonify?(jsonifiedModel: any): M
+  tasks?: {[name:string]:MarkScript.Task}
 }
 export type TypeModel = s.KeyValue<s.reflective.Module>
-export type BuildModel = m.Model & m.AssetModel
-export type Task<S extends Server> = ((buildModel: BuildModel, buildConfig: BuildConfig, server: S) => void) & { requiresFreshModel?: boolean }
+//export type BuildModel = m.Model & m.AssetModel
+// export interface Task<R extends Runtime> {
+//   execute(buildModel?: MarkScript.BuildModel, buildConfig?: BuildConfig, runtime?: R):void
+//   description?: string
+//   requiresFreshModel?: boolean
+// }
 
-export interface Server {
-  getClient(portOrDatabase?: number | string): DatabaseClient
-}
 
-export interface ServerConstructor<S extends Server> {
-  new (buildModel: BuildModel, buildConfig: BuildConfig, pkgDir?: string): S
-}
+// export interface Runtime {
+//   //getClient(portOrDatabase?: number | string): DatabaseClient
+// }
 
-export interface BuildConfig {
-  databaseConnection: {
-    host: string
-    httpPort: number
-    adminPort?: number
-    configPort?: number
-    user: string
-    password?: string
-  }
-}
+// export interface RuntimeConstructor<S extends Runtime> {
+//   new (buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?: string): S
+// }
 
-export enum BuildModelPersistance {
-  NONE,
-  NO_SOURCE,
-  ALL
-}
-export interface BuildOptions {
-  buildConfig: BuildConfig
-  pkgDir: string
-  isTypeScript?: boolean
+// export interface BuildConfig {
+//   databaseConnection: {
+//     host: string
+//     httpPort: number
+//     adminPort?: number
+//     configPort?: number
+//     user: string
+//     password?: string
+//   }
+//   buildModelPersistance?: BuildModelPersistance
+// }
+
+export interface BuildOptions extends MarkScript.Build {
+  // buildConfig: BuildConfig
+  // pkgDir: string
   plugins: BuildModelPlugin<any, any>[]
-  server?: ServerConstructor<any>
-  tasks?: Task<any>[]
+  // runtime: RuntimeConstructor
+//  tasks?: {[name:string]:Task}
+//  buildModelPersistanceFolder?: string
+
+  isTypeScript?: boolean
   typeModel?: s.KeyValue<s.reflective.Module>
-  buildModelPersistance?: BuildModelPersistance
-  buildModelPersistanceFolder?: string
 }
 
 export class Build {
   options: BuildOptions
+  tasks: {[name:string]: MarkScript.Task} = {}
 
   constructor(options: BuildOptions) {
+    let self = this
     this.options = options
+    options.plugins.forEach(function(plugin){
+      if (plugin.tasks) {
+        Object.keys(plugin.tasks).forEach(function(key){
+          self.tasks[key] = plugin.tasks[key]
+        })
+      }
+    })
+    if (options.tasks) {
+      Object.keys(options.tasks).forEach(function(key){
+        self.tasks[key] = options.tasks[key]
+      })
+    }
   }
+
   runTasks(names: string | string[]) {
-    let persistsModel = this.options.buildModelPersistance === BuildModelPersistance.NO_SOURCE || this.options.buildModelPersistance === BuildModelPersistance.ALL
+    let persistsModel = this.options.buildConfig.buildModelPersistance === MarkScript.BuildModelPersistance.NO_SOURCE || this.options.buildConfig.buildModelPersistance === MarkScript.BuildModelPersistance.ALL
     let persistedModelFileName: string
     if (persistsModel) {
       let dirName = path.join(this.options.pkgDir, this.options.buildModelPersistanceFolder || 'deployed')
@@ -69,14 +85,17 @@ export class Build {
     }
 
     let self = this
-    let buildModel: BuildModel
-    let server: Server
+    let buildModel: MarkScript.BuildModel
+    let server
 
     if (!Array.isArray(names)) {
       names = [<string>names]
     }
     (<string[]>names).forEach(function(name) {
-      let task = getTask(name)
+      let task = self.tasks[name]
+      if (!task) {
+        throw new Error(`Task "${name}" not in list of tasks: ${Object.keys(self.tasks)}`)
+      }
       let rebuildServer = false
 
       if (!buildModel && !task.requiresFreshModel && persistedModelFileName && fs.existsSync(persistedModelFileName)) {
@@ -91,101 +110,22 @@ export class Build {
         buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, typeModel)
 
         if (persistsModel) {
-          fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildModelPersistance))
+          fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildConfig.buildModelPersistance))
         }
         rebuildServer = true
       }
 
       if (rebuildServer) {
-        server = new self.options.server(buildModel, self.options.buildConfig, self.options.pkgDir)
+        server = new self.options.runtime(buildModel, self.options.buildConfig, self.options.pkgDir)
       }
 
-      task(buildModel, self.options.buildConfig, server)
+      task.execute(buildModel, self.options.buildConfig, server)
     })
   }
 }
 
-function getTask(taskName: string, tasks?: Task<any>[]): Task<any> {
-  if (tasks && tasks[name]) {
-    return tasks[name]
-  } else {
-    name = name.toLowerCase()
-    switch (name) {
-      case 'create':
-        return createTask
-      case 'remove':
-        return removeTask
-      case 'deploy':
-        return deployTask
-      case 'undeploy':
-        return undeployTask
-    }
-  }
-}
-
-function createTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let configClient = server.getClient(buildConfig.databaseConnection.configPort || 8002)
-  return d.deploy(configClient, new d.StandardDeployer(), m.IF_EXISTS.clear, buildModel)
-}
-(<Task<any>>createTask).requiresFreshModel = true
-
-function removeTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let configClient = server.getClient(buildConfig.databaseConnection.configPort || 8002)
-  return d.undeploy(configClient, new d.StandardDeployer(), buildModel)
-}
-
-function deployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let adminClient = server.getClient(buildConfig.databaseConnection.adminPort || 8001)
-  let configClient = server.getClient(buildConfig.databaseConnection.configPort || 8002)
-  return d.deployAssets(adminClient, configClient, function(database) {
-    return server.getClient(database)
-  }, new d.StandardAssetDeployer(), buildModel, buildModel)
-}
-(<Task<any>>deployTask).requiresFreshModel = true
-
-function undeployTask(buildModel: BuildModel, buildConfig: BuildConfig, server: Server) {
-  let client = server.getClient(buildConfig.databaseConnection.httpPort || 8000)
-  return d.undeployAssets(client, new d.StandardDeployer(), this.options.database.model)
-}
-
-export class CoreServer implements Server {
-  buildConfig: BuildConfig
-  constructor(buildModel: BuildModel, buildConfig: BuildConfig) {
-    this.buildConfig = buildConfig
-  }
-
-  getClient(portOrDatabase?: number | string): DatabaseClient {
-    return createDatabaseClient({
-      host: this.buildConfig.databaseConnection.host,
-      port: typeof portOrDatabase === 'string' ? 8000 : <number>portOrDatabase,
-      user: this.buildConfig.databaseConnection.user,
-      password: this.buildConfig.databaseConnection.password,
-      database: typeof portOrDatabase === 'string' ? <string>portOrDatabase : 'Documents'
-    })
-  }
-}
-
-function serialiseBuildModel(buildModel: BuildModel, plugins: BuildModelPlugin<any, any>[], buildModelPersistance: BuildModelPersistance): string {
-  let serialisable: any = {
-    databases: buildModel.databases,
-    servers: buildModel.servers,
-    ruleSets: buildModel.ruleSets,
-    tasks: buildModel.tasks,
-    alerts: buildModel.alerts
-  }
-  if (buildModelPersistance === BuildModelPersistance.ALL) {
-    serialisable.modules = buildModel.modules
-    serialisable.extensions = buildModel.extensions
-  } else {
-    serialisable.modules = {}
-    serialisable.extensions = {}
-    Object.keys(buildModel.modules).forEach(function(name) {
-      serialisable.modules[name] = { name: name, code: '' }
-    })
-    Object.keys(buildModel.extensions).forEach(function(name) {
-      serialisable.extensions[name] = { name: name, code: '' }
-    })
-  }
+function serialiseBuildModel(buildModel: MarkScript.BuildModel, plugins: BuildModelPlugin<any, any>[], buildModelPersistance: MarkScript.BuildModelPersistance): string {
+  let serialisable: any = {}
 
   plugins.forEach(function(plugin) {
     if (plugin.jsonify) {
@@ -199,21 +139,13 @@ function serialiseBuildModel(buildModel: BuildModel, plugins: BuildModelPlugin<a
   return JSON.stringify(serialisable)
 }
 
-function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlugin<any, any>[]): BuildModel {
+function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlugin<any, any>[]): MarkScript.BuildModel {
   let serialisable = JSON.parse(buildModelString)
-  let buildModel: BuildModel = {
-    databases: serialisable.databases,
-    servers: serialisable.servers,
-    ruleSets: serialisable.ruleSets,
-    modules: serialisable.modules,
-    extensions: serialisable.extensions,
-    tasks: serialisable.tasks,
-    alerts: serialisable.alerts
-  }
+  let buildModel= <MarkScript.BuildModel> {}
 
   plugins.forEach(function(plugin) {
     if (plugin.dejsonify) {
-      let s = plugin.dejsonify(buildModelString)
+      let s = plugin.dejsonify(serialisable)
       Object.keys(s).forEach(function(key) {
         buildModel[key] = s[key]
       })
@@ -223,8 +155,8 @@ function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlug
   return buildModel
 }
 
-function generateBuildModel(buildConfig: BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir:string, typeModel: s.KeyValue<s.reflective.Module>) {
-  let buildModel: BuildModel = {
+function generateBuildModel(buildConfig: MarkScript.BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir:string, typeModel: s.KeyValue<s.reflective.Module>) {
+  let buildModel: MarkScript.BuildModel = {
     databases: {},
     servers: {},
     ruleSets: [],

@@ -15,20 +15,24 @@
     },
     "compileOnSave": true,
     "filesGlob": [
+        "model.d.ts",
         "build.d.ts",
         "src/**/*.ts",
         "typings/**/*.d.ts",
         "node_modules/marklogic-node-typescript-definitions/ts/index.d.ts"
     ],
     "files": [
+        "model.d.ts",
         "build.d.ts",
+        "src/bin/cli.ts",
         "src/lib/admin/alerts/deleteAlert.ts",
         "src/lib/admin/alerts/getAlert.ts",
         "src/lib/admin/alerts/installAlert.ts",
         "src/lib/build.ts",
+        "src/lib/coreBuildPlugin.ts",
+        "src/lib/coreRuntime.ts",
         "src/lib/deployer.ts",
         "src/lib/index.ts",
-        "src/lib/model.ts",
         "src/lib/modelVisitor.ts",
         "src/test/admin/alert/installAndDeleteAlert.ts",
         "src/test/createTestClient.ts",
@@ -38,6 +42,7 @@
         "typings/should-promised/should-promised.d.ts",
         "typings/should/should.d.ts",
         "typings/tsd.d.ts",
+        "typings/yargs/yargs.d.ts",
         "node_modules/marklogic-node-typescript-definitions/ts/index.d.ts"
     ],
     "exclude": []
