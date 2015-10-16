@@ -4,11 +4,17 @@ import {DatabaseClient} from 'marklogic'
 import * as path from 'path'
 import * as fs from 'fs'
 
+export enum BuildModelPersistance {
+  NONE,
+  NO_SOURCE,
+  ALL
+}
+
 export interface BuildModelPlugin<C, M> {
-  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M
-  jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>): any
+  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M
+  jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any
   dejsonify?(jsonifiedModel: any): M
-  tasks?: {[name:string]:MarkScript.Task}
+  tasks?: { [name: string]: MarkScript.Task }
 }
 export type TypeModel = s.KeyValue<s.reflective.Module>
 
@@ -16,31 +22,32 @@ export interface BuildOptions extends MarkScript.Build {
   plugins: BuildModelPlugin<any, any>[]
   isTypeScript?: boolean
   typeModel?: s.KeyValue<s.reflective.Module>
+  buildModelPersistance?: BuildModelPersistance
 }
 
 export class Build {
   options: BuildOptions
-  tasks: {[name:string]: MarkScript.Task} = {}
+  tasks: { [name: string]: MarkScript.Task } = {}
 
   constructor(options: BuildOptions) {
     let self = this
     this.options = options
-    options.plugins.forEach(function(plugin){
+    options.plugins.forEach(function(plugin) {
       if (plugin.tasks) {
-        Object.keys(plugin.tasks).forEach(function(key){
+        Object.keys(plugin.tasks).forEach(function(key) {
           self.tasks[key] = plugin.tasks[key]
         })
       }
     })
     if (options.tasks) {
-      Object.keys(options.tasks).forEach(function(key){
+      Object.keys(options.tasks).forEach(function(key) {
         self.tasks[key] = options.tasks[key]
       })
     }
   }
 
   runTasks(names: string | string[]) {
-    let persistsModel = this.options.buildConfig.buildModelPersistance === MarkScript.BuildModelPersistance.NO_SOURCE || this.options.buildConfig.buildModelPersistance === MarkScript.BuildModelPersistance.ALL
+    let persistsModel = this.options.buildModelPersistance === BuildModelPersistance.NO_SOURCE || this.options.buildModelPersistance === BuildModelPersistance.ALL
     let persistedModelFileName: string
     if (persistsModel) {
       let dirName = path.join(this.options.pkgDir, this.options.buildModelPersistanceFolder || 'deployed')
@@ -57,10 +64,16 @@ export class Build {
     if (!Array.isArray(names)) {
       names = [<string>names]
     }
-    (<string[]>names).forEach(function(name) {
+    let i = -1
+    function executeTask(): Promise<any> {
+      i++
+      if (i === (<string[]>names).length) {
+        return Promise.resolve(true)
+      }
+      let name = (<string[]>names)[i]
       let task = self.tasks[name]
       if (!task) {
-        throw new Error(`Task "${name}" not in list of tasks: ${Object.keys(self.tasks)}`)
+        throw new Error(`Task "${name}" not in list of tasks: ${Object.keys(self.tasks) }`)
       }
       let rebuildServer = false
 
@@ -76,7 +89,7 @@ export class Build {
         buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, typeModel)
 
         if (persistsModel) {
-          fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildConfig.buildModelPersistance))
+          fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildModelPersistance))
         }
         rebuildServer = true
       }
@@ -85,12 +98,13 @@ export class Build {
         server = new self.options.runtime(buildModel, self.options.buildConfig, self.options.pkgDir)
       }
 
-      task.execute(buildModel, self.options.buildConfig, server)
-    })
+      return task.execute(buildModel, self.options.buildConfig, server).then(executeTask)
+    }
+    return executeTask()
   }
 }
 
-function serialiseBuildModel(buildModel: MarkScript.BuildModel, plugins: BuildModelPlugin<any, any>[], buildModelPersistance: MarkScript.BuildModelPersistance): string {
+function serialiseBuildModel(buildModel: MarkScript.BuildModel, plugins: BuildModelPlugin<any, any>[], buildModelPersistance: BuildModelPersistance): string {
   let serialisable: any = {}
 
   plugins.forEach(function(plugin) {
@@ -102,12 +116,12 @@ function serialiseBuildModel(buildModel: MarkScript.BuildModel, plugins: BuildMo
     }
   })
 
-  return JSON.stringify(serialisable)
+  return JSON.stringify(serialisable, null, '  ')
 }
 
 function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlugin<any, any>[]): MarkScript.BuildModel {
   let serialisable = JSON.parse(buildModelString)
-  let buildModel= <MarkScript.BuildModel> {}
+  let buildModel = <MarkScript.BuildModel>{}
 
   plugins.forEach(function(plugin) {
     if (plugin.dejsonify) {
@@ -121,7 +135,7 @@ function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlug
   return buildModel
 }
 
-function generateBuildModel(buildConfig: MarkScript.BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir:string, typeModel: s.KeyValue<s.reflective.Module>) {
+function generateBuildModel(buildConfig: MarkScript.BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir: string, typeModel: s.KeyValue<s.reflective.Module>) {
   let buildModel: MarkScript.BuildModel = {
     databases: {},
     servers: {},

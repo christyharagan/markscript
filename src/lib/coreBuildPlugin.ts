@@ -1,4 +1,5 @@
-import {BuildModelPlugin} from './build'
+import * as s from 'typescript-schema'
+import {BuildModelPlugin, BuildModelPersistance} from './build'
 import {Runtime} from './coreRuntime'
 import * as d from './deployer'
 
@@ -7,7 +8,7 @@ export const coreBuildPlugin:BuildModelPlugin<MarkScript.BuildConfig, MarkScript
     return buildModel
   },
 
-  jsonify: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig): any {
+  jsonify: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any {
     let serialisable: any = {
       databases: buildModel.databases,
       servers: buildModel.servers,
@@ -15,7 +16,7 @@ export const coreBuildPlugin:BuildModelPlugin<MarkScript.BuildConfig, MarkScript
       tasks: buildModel.tasks,
       alerts: buildModel.alerts
     }
-    if (buildConfig.buildModelPersistance === MarkScript.BuildModelPersistance.ALL) {
+    if (buildModelPersistance === BuildModelPersistance.ALL) {
       serialisable.modules = buildModel.modules
       serialisable.extensions = buildModel.extensions
     } else {

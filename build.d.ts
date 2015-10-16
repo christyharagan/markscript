@@ -22,22 +22,15 @@ declare module MarkScript {
     requiresFreshModel?: boolean
   }
 
-  enum BuildModelPersistance {
-    NONE,
-    NO_SOURCE,
-    ALL
-  }
-
   interface BuildConfig {
     databaseConnection: {
-      host: string
-      httpPort: number
+      host?: string
+      httpPort?: number
       adminPort?: number
       configPort?: number
       user: string
       password?: string
     }
     model?:BuildModel
-    buildModelPersistance?: BuildModelPersistance
   }
 }

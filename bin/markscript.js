@@ -5,37 +5,38 @@ var Build = require('../lib/build');
 var coreBuildPlugin_1 = require('../lib/coreBuildPlugin');
 var p = require('typescript-package');
 var Yargs = require('yargs');
-var os = require('os');
 var ts = require('typescript');
-var chalk = require("chalk");
-var sanitize = require("sanitize-filename");
-var Liftoff = require('liftoff');
-var cli = new Liftoff({
-    name: 'markscript',
-    configName: 'markscriptfile',
-    extensions: {
-        '.ts': null,
-        '.js': null
+var cwd = process.cwd();
+var markscriptFile;
+var isTypeScript;
+if (fs.existsSync(path.join(cwd, 'markscriptfile.ts'))) {
+    markscriptFile = path.join(cwd, 'markscriptfile.ts');
+    isTypeScript = true;
+}
+else if (fs.existsSync(path.join(cwd, 'markscriptfile.js'))) {
+    markscriptFile = path.join(cwd, 'markscriptfile.js');
+    isTypeScript = false;
+}
+var yargs = Yargs
+    .usage('Build your MarkScript project.\nUsage: markscript <task>')
+    .demand(1)
+    .command('init', 'Initialise a new MarkScript project')
+    .help('help')
+    .version(p.getPackageJson(cwd).version);
+var build;
+if (markscriptFile) {
+    if (isTypeScript) {
+        var options = {
+            module: 1,
+            target: 1,
+            moduleResolution: 1
+        };
+        function req(module, filename) {
+            module._compile(ts.transpile(fs.readFileSync(filename).toString(), options), filename);
+        }
+        require.extensions['.ts'] = req;
     }
-});
-cli.launch({}, function (env) {
-    var yargs = Yargs
-        .usage('Build your MarkScript project.\nUsage: markscript <task>')
-        .demand(1)
-        .command('init', 'Initialise a new MarkScript project')
-        .help('help')
-        .version(p.getPackageJson(env.cwd).version);
-    var argv = yargs.argv;
-    var taskName = argv._[0];
-    if (taskName === 'init') {
-        console.log('TODO - Sorry ;)');
-        process.exit(1);
-    }
-    if (!env.configPath) {
-        console.error('markscriptfile.{js,ts} not found');
-        process.exit(1);
-    }
-    var buildFile = require(env.configPath).build;
+    var buildFile = require(markscriptFile).build;
     if (!buildFile) {
         console.error('markscriptfile should export a const value called "build" of type MarkScript.Build');
         process.exit(1);
@@ -44,60 +45,35 @@ cli.launch({}, function (env) {
     if (buildFile.plugins) {
         plugins = plugins.concat(buildFile.plugins);
     }
-    var pkgDir = buildFile.pkgDir || env.cwd;
+    var pkgDir = buildFile.pkgDir || cwd;
     process.chdir(pkgDir);
-    var isTypeScript = env.configPath.substring(env.configPath.length - 3) === '.ts';
-    var build = new Build.Build({
+    build = new Build.Build({
         buildConfig: buildFile.buildConfig,
         plugins: plugins,
         pkgDir: pkgDir,
         buildModelPersistanceFolder: buildFile.buildModelPersistanceFolder,
         isTypeScript: isTypeScript,
         runtime: buildFile.runtime,
-        tasks: buildFile.tasks
+        tasks: buildFile.tasks,
+        buildModelPersistance: Build.BuildModelPersistance.NO_SOURCE
     });
     Object.keys(build.tasks).forEach(function (taskName) {
         yargs.command(taskName, build.tasks[taskName].description);
     });
-    if (isTypeScript) {
-        var sanitizeOptions = {
-            replacement: "_"
-        };
-        var parts = process.cwd().split(path.sep).map(function (p) {
-            return sanitize(p, sanitizeOptions);
-        });
-        var cachePath = path.join.apply(null, parts);
-        var outDir = path.join(os.tmpdir(), 'markscript-to-typescript', cachePath);
-        var options = {
-            module: 1,
-            rootDir: '.',
-            outDir: outDir,
-            target: 1,
-            moduleResolution: 2
-        };
-        function compile(filename, options) {
-            var program = ts.createProgram([filename], options);
-            var emitResult = program.emit();
-            var allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
-            if (allDiagnostics.length > 0) {
-                allDiagnostics.forEach(function (diagnostic) {
-                    var position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-                    console.error(chalk.bgRed(String(diagnostic.code)), chalk.grey(diagnostic.file.fileName + ", (" + position.line + ", " + position.character + ")"), diagnostic.messageText);
-                });
-                throw new Error('TypeScript Compilation Errors');
-            }
-        }
-        function req(module, filename) {
-            var relative = path.relative(path.join(process.cwd(), options.rootDir), path.dirname(filename));
-            var basename = path.basename(filename, '.ts');
-            var out = path.join(outDir, relative, basename + '.js');
-            if (!fs.readFileSync(out) || (fs.statSync(out).mtime > fs.statSync(filename).mtime)) {
-                compile(filename, options);
-            }
-            module._compile(fs.readFileSync(out, 'utf8'), filename);
-        }
-        require.extensions['.ts'] = req;
+}
+var argv = yargs.argv;
+var taskName = argv._[0];
+if (taskName === 'init') {
+    console.log('TODO - Sorry ;)');
+    process.exit(1);
+}
+build.runTasks(taskName).catch(function (e) {
+    if (e.stack) {
+        console.error(e.stack);
     }
-    build.runTasks(taskName);
+    else {
+        console.error(e);
+    }
+    process.exit(1);
 });
-//# sourceMappingURL=cli.js.map
+//# sourceMappingURL=markscript.js.map
