@@ -14,10 +14,10 @@ export class CoreRuntime implements Runtime {
   getClient(portOrDatabase?: number | string): DatabaseClient {
     return createDatabaseClient({
       host: this.buildConfig.databaseConnection.host || os.hostname(),
-      port: typeof portOrDatabase === 'string' ? 8000 : <number>portOrDatabase,
+      port: (!portOrDatabase || typeof portOrDatabase === 'string') ? this.buildConfig.databaseConnection.httpPort : <number>portOrDatabase,
       user: this.buildConfig.databaseConnection.user,
       password: this.buildConfig.databaseConnection.password,
-      database: typeof portOrDatabase === 'string' ? <string>portOrDatabase : 'Documents'
+      database: (portOrDatabase && typeof portOrDatabase === 'string') ? <string>portOrDatabase : null
     })
   }
 }

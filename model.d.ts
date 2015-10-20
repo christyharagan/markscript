@@ -41,11 +41,11 @@ declare module MarkScript {
     name: string
     code?: string
   }
-  enum TRIGGER_COMMIT {
+  const enum TRIGGER_COMMIT {
     PRE = 0,
     POST = 1
   }
-  enum TRIGGER_STATE {
+  const enum TRIGGER_STATE {
     CREATE = 0,
     MODIFY = 1,
     DELETE = 2
@@ -58,7 +58,7 @@ declare module MarkScript {
     commit?: TRIGGER_COMMIT
     actionModule: string
   }
-  enum FrequencyType {
+  const enum FrequencyType {
     MINUTES = 0,
     HOURS = 1,
     DAYS = 2

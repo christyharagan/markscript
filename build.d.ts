@@ -32,5 +32,6 @@ declare module MarkScript {
       password?: string
     }
     model?:BuildModel
+    assetBaseDir?: string
   }
 }

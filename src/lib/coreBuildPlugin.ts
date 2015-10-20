@@ -8,13 +8,18 @@ export const coreBuildPlugin:BuildModelPlugin<MarkScript.BuildConfig, MarkScript
     return buildModel
   },
 
-  jsonify: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any {
+  jsonify: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any {
     let serialisable: any = {
       databases: buildModel.databases,
       servers: buildModel.servers,
       ruleSets: buildModel.ruleSets,
       tasks: buildModel.tasks,
-      alerts: buildModel.alerts
+      alerts: buildModel.alerts,
+      contentDatabase: buildModel.contentDatabase,
+      modulesDatabase: buildModel.modulesDatabase,
+      securityDatabase: buildModel.securityDatabase,
+      schemaDatabase: buildModel.schemaDatabase,
+      triggersDatabase: buildModel.triggersDatabase
     }
     if (buildModelPersistance === BuildModelPersistance.ALL) {
       serialisable.modules = buildModel.modules
@@ -40,7 +45,12 @@ export const coreBuildPlugin:BuildModelPlugin<MarkScript.BuildConfig, MarkScript
       modules: serialisable.modules,
       extensions: serialisable.extensions,
       tasks: serialisable.tasks,
-      alerts: serialisable.alerts
+      alerts: serialisable.alerts,
+      contentDatabase: serialisable.contentDatabase,
+      modulesDatabase: serialisable.modulesDatabase,
+      securityDatabase: serialisable.securityDatabase,
+      schemaDatabase: serialisable.schemaDatabase,
+      triggersDatabase: serialisable.triggersDatabase
     }
   },
 
@@ -74,7 +84,7 @@ export const coreBuildPlugin:BuildModelPlugin<MarkScript.BuildConfig, MarkScript
     undeploy: {
       execute: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, server: Runtime) {
         let client = server.getClient(buildConfig.databaseConnection.httpPort || 8000)
-        return d.undeployAssets(client, new d.StandardDeployer(), this.options.database.model)
+        return d.undeployAssets(client, new d.StandardDeployer(), buildModel)
       },
       description: 'Remove the previously deployed assets (modules, extensions, alerts, etc.) to the MarkLogic HTTP server and databases'
     },

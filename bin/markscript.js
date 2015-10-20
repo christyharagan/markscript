@@ -55,7 +55,7 @@ if (markscriptFile) {
         isTypeScript: isTypeScript,
         runtime: buildFile.runtime,
         tasks: buildFile.tasks,
-        buildModelPersistance: Build.BuildModelPersistance.NO_SOURCE
+        buildModelPersistance: 1
     });
     Object.keys(build.tasks).forEach(function (taskName) {
         yargs.command(taskName, build.tasks[taskName].description);

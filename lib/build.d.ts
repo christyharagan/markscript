@@ -1,12 +1,12 @@
 import * as s from 'typescript-schema';
-export declare enum BuildModelPersistance {
+export declare const enum BuildModelPersistance {
     NONE = 0,
     NO_SOURCE = 1,
     ALL = 2,
 }
 export interface BuildModelPlugin<C, M> {
-    generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M;
-    jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any;
+    generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M;
+    jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any;
     dejsonify?(jsonifiedModel: any): M;
     tasks?: {
         [name: string]: MarkScript.Task;
@@ -17,6 +17,7 @@ export interface BuildOptions extends MarkScript.Build {
     plugins: BuildModelPlugin<any, any>[];
     isTypeScript?: boolean;
     typeModel?: s.KeyValue<s.reflective.Module>;
+    assetTypeModel?: s.KeyValue<s.reflective.Module>;
     buildModelPersistance?: BuildModelPersistance;
 }
 export declare class Build {

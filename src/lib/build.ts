@@ -4,15 +4,15 @@ import {DatabaseClient} from 'marklogic'
 import * as path from 'path'
 import * as fs from 'fs'
 
-export enum BuildModelPersistance {
+export const enum BuildModelPersistance {
   NONE,
   NO_SOURCE,
   ALL
 }
 
 export interface BuildModelPlugin<C, M> {
-  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M
-  jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any
+  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M
+  jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any
   dejsonify?(jsonifiedModel: any): M
   tasks?: { [name: string]: MarkScript.Task }
 }
@@ -22,6 +22,7 @@ export interface BuildOptions extends MarkScript.Build {
   plugins: BuildModelPlugin<any, any>[]
   isTypeScript?: boolean
   typeModel?: s.KeyValue<s.reflective.Module>
+  assetTypeModel?: s.KeyValue<s.reflective.Module>
   buildModelPersistance?: BuildModelPersistance
 }
 
@@ -83,10 +84,16 @@ export class Build {
       } else if (!buildModel || task.requiresFreshModel) {
         let typeModel: s.KeyValue<s.reflective.Module> = self.options.typeModel
         if (!typeModel && self.options.isTypeScript) {
-          let rawPackage: s.PackageFactory = p.packageAstToFactory(self.options.pkgDir)
+          let rawPackage = p.packageAstToFactory(self.options.pkgDir)
           typeModel = rawPackage.construct(s.factoryToReflective())().modules
         }
-        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, typeModel)
+
+        let assetTypeModel: s.KeyValue<s.reflective.Module> = self.options.typeModel
+        if (!assetTypeModel && self.options.isTypeScript) {
+          var rawPackage = p.packageAstToFactory(self.options.buildConfig.assetBaseDir ? path.join(self.options.pkgDir, self.options.buildConfig.assetBaseDir) : self.options.pkgDir);
+          assetTypeModel = rawPackage.construct(s.factoryToReflective())().modules
+        }
+        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, typeModel, assetTypeModel)
 
         if (persistsModel) {
           fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildModelPersistance))
@@ -135,7 +142,7 @@ function deserialiseBuildModel(buildModelString: string, plugins: BuildModelPlug
   return buildModel
 }
 
-function generateBuildModel(buildConfig: MarkScript.BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir: string, typeModel: s.KeyValue<s.reflective.Module>) {
+function generateBuildModel(buildConfig: MarkScript.BuildConfig, plugins: BuildModelPlugin<any, any>[], pkgDir: string, typeModel: s.KeyValue<s.reflective.Module>, assetTypeModel: s.KeyValue<s.reflective.Module>) {
   let buildModel: MarkScript.BuildModel = {
     databases: {},
     servers: {},
@@ -147,7 +154,7 @@ function generateBuildModel(buildConfig: MarkScript.BuildConfig, plugins: BuildM
   }
 
   plugins.forEach(function(plugin) {
-    buildModel = plugin.generate(buildModel, buildConfig, pkgDir, typeModel)
+    buildModel = plugin.generate(buildModel, buildConfig, pkgDir, typeModel, assetTypeModel)
   })
 
   return buildModel

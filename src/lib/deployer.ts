@@ -439,18 +439,18 @@ export class StandardAssetDeployer implements AssetDeployer {
       spec.code = '// EMPTY MODULE'
     }
     return new Promise(function(resolve, reject) {
-      client.config.extlibs.write({
-        path: name,
-        contentType: 'application/vnd.marklogic-javascript',
-        source: normaliseRequires(spec.name, spec.code)
-      }).result(function() {
+      client.documents.write([{
+        uri: name,
+        content: normaliseRequires(spec.name, spec.code),
+        contentType: 'application/vnd.marklogic-javascript'
+      }]).result(function() {
         resolve(true)
       }, reject)
     })
   }
   undeployModule(client: DatabaseClient, spec: MarkScript.ModuleSpec): Promise<boolean> {
     return new Promise(function(resolve, reject) {
-      client.config.extlibs.remove(toModuleName(spec.name)).result(function() {
+      client.documents.remove(toModuleName(spec.name)).result(function() {
         resolve(true)
       }, reject)
     })
