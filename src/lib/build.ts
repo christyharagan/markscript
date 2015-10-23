@@ -60,7 +60,7 @@ export class Build {
 
     let self = this
     let buildModel: MarkScript.BuildModel
-    let server
+    let server:MarkScript.Runtime
 
     if (!Array.isArray(names)) {
       names = [<string>names]
@@ -105,7 +105,10 @@ export class Build {
         server = new self.options.runtime(buildModel, self.options.buildConfig, self.options.pkgDir)
       }
 
-      return task.execute(buildModel, self.options.buildConfig, server).then(executeTask)
+      let serverPromise = (server && server.start) ? server.start() : Promise.resolve(true)
+      return serverPromise.then(function(){
+        return task.execute(buildModel, self.options.buildConfig, server)
+      }).then(executeTask)
     }
     return executeTask()
   }

@@ -1,5 +1,5 @@
 import { DatabaseClient } from 'marklogic';
-export declare enum IF_EXISTS {
+export declare const enum IF_EXISTS {
     recreate = 0,
     clear = 1,
     ignore = 2,

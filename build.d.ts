@@ -13,7 +13,11 @@ declare module MarkScript {
   type BuildModel = Model & AssetModel
 
   interface RuntimeConstructor {
-    new (buildModel: BuildModel, buildConfig: BuildConfig, pkgDir?: string): any
+    new (buildModel: BuildModel, buildConfig: BuildConfig, pkgDir?: string): Runtime
+  }
+  interface Runtime {
+    start?():Promise<boolean>
+    stop?():Promise<boolean>
   }
 
   interface Task {

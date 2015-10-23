@@ -24,7 +24,6 @@
     "files": [
         "model.d.ts",
         "build.d.ts",
-        "src/bin/markscript.ts",
         "src/lib/admin/alerts/deleteAlert.ts",
         "src/lib/admin/alerts/getAlert.ts",
         "src/lib/admin/alerts/installAlert.ts",
@@ -42,7 +41,6 @@
         "typings/should-promised/should-promised.d.ts",
         "typings/should/should.d.ts",
         "typings/tsd.d.ts",
-        "typings/yargs/yargs.d.ts",
         "node_modules/marklogic-node-typescript-definitions/ts/index.d.ts"
     ],
     "exclude": []
