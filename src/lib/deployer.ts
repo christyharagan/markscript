@@ -171,8 +171,7 @@ function deleteAll(dir) {
 }
 exports.deleteAll = deleteAll;
 function deleteGraph(graph) {
-    var sem = r`
-markscriptCode += `equire('/MarkLogic/semantics.xqy');
+    var sem = require('/MarkLogic/semantics.xqy');
     graph = graph || 'http://marklogic.com/semantics#default-graph';
     sem.graphDelete(sem.iri(graph));
 }
@@ -335,90 +334,60 @@ var BasicSubject = (function () {
     function BasicSubject() {
         this.observers = [];
         this.index = 0;
-        this.disposed = false;
+        this.unsubscribed = false;
     }
-    BasicSubject.prototype.map = function (selector, thisArg) {
+    BasicSubject.prototype.map = function (selector) {
         var observable = new BasicSubject();
         var self = this;
-        var onNext = observable.onNext;
-        var onError = observable.onError;
-        var onCompleted = observable.onCompleted;
+        var onNext = observable.next;
+        var onError = observable.error;
+        var onCompleted = observable.complete;
         this.subscribe({
-            onNext: function (value) {
-                onNext.call(observable, selector(value, this.index++, self));
+            next: function (value) {
+                onNext.call(observable, selector(value));
             },
-            onError: function (exception) {
+            error: function (exception) {
                 onError.call(observable, exception);
             },
-            onCompleted: function () {
+            complete: function () {
                 onCompleted.call(observable);
             }
         });
-        observable.onNext = this.onNext.bind(this);
-        observable.onError = this.onError.bind(this);
-        observable.onCompleted = this.onCompleted.bind(this);
+        observable.next = this.next.bind(this);
+        observable.error = this.error.bind(this);
+        observable.complete = this.complete.bind(this);
         return observable;
     };
-    BasicSubject.prototype.onNext = function (value) {
-        if (!this.disposed) {
+    BasicSubject.prototype.next = function (value) {
+        if (!this.unsubscribed) {
             this.observers.forEach(function (observer) {
-                observer.onNext(value);
+                observer.next(value);
             });
         }
     };
-    BasicSubject.prototype.onError = function (e) {
-        if (!this.disposed) {
+    BasicSubject.prototype.error = function (e) {
+        if (!this.unsubscribed) {
             this.observers.forEach(function (observer) {
-                observer.onError(e);
+                observer.error(e);
             });
         }
     };
-    BasicSubject.prototype.onCompleted = function () {
-        if (!this.disposed) {
+    BasicSubject.prototype.complete = function () {
+        if (!this.unsubscribed) {
             this.observers.forEach(function (observer) {
-                observer.onCompleted();
+                observer.complete();
             });
         }
-    };
-    BasicSubject.prototype.dispose = function () {
-        this.disposed = true;
-        this.observers = [];
     };
     BasicSubject.prototype.subscribe = function (observer) {
-        if (!this.disposed) {
+        if (!this.unsubscribed) {
             this.observers.push(observer);
         }
-        return this;
-    };
-    BasicSubject.prototype.subscribeOnNext = function (onNext, thisArg) {
-        if (!this.disposed) {
-            this.observers.push({
-                onNext: onNext.bind(thisArg),
-                onError: function (e) { },
-                onCompleted: function () { }
-            });
-        }
-        return this;
-    };
-    BasicSubject.prototype.subscribeOnError = function (onError, thisArg) {
-        if (!this.disposed) {
-            this.observers.push({
-                onNext: function (value) { },
-                onError: onError.bind(thisArg),
-                onCompleted: function () { }
-            });
-        }
-        return this;
-    };
-    BasicSubject.prototype.subscribeOnCompleted = function (onCompleted, thisArg) {
-        if (!this.disposed) {
-            this.observers.push({
-                onNext: function (value) { },
-                onError: function (e) { },
-                onCompleted: onCompleted.bind(thisArg)
-            });
-        }
-        return this;
+        var self = this;
+        return function () {
+            self.unsubscribed = true;
+            self.observers = [];
+        };
     };
     return BasicSubject;
 })();
@@ -519,17 +488,18 @@ var HttpObserver = (function () {
         }
         this.options = options || {};
     }
-    HttpObserver.prototype.onNext = function (value) {
+    HttpObserver.prototype.next = function (value) {
         xdmp.httpPost(this.uri, this.options, { value: value });
     };
-    HttpObserver.prototype.onError = function (exception) {
+    HttpObserver.prototype.error = function (exception) {
         xdmp.httpPost(this.uri, this.options, { error: exception });
     };
-    HttpObserver.prototype.onCompleted = function () {
+    HttpObserver.prototype.complete = function () {
     };
     return HttpObserver;
 })();
-exports.HttpObserver = HttpObserver;`
+exports.HttpObserver = HttpObserver;
+`
 
 export function deployAssets(adminClient: DatabaseClient, configClient: DatabaseClient, createClient: (database: string) => DatabaseClient, deployer: AssetDeployer, model: MarkScript.Model, assetModel: MarkScript.AssetModel): Promise<boolean> {
   let promises: Promise<boolean>[] = []
