@@ -11,7 +11,7 @@ export const enum BuildModelPersistance {
 }
 
 export interface BuildModelPlugin<C, M> {
-  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildDir?:string): MarkScript.BuildModel & M
+  generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, buildTypeModel?: s.KeyValue<s.reflective.Module>, runtimeTypeModel?: s.KeyValue<s.reflective.Module>, buildDir?:string): MarkScript.BuildModel & M
   jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any
   dejsonify?(jsonifiedModel: any): M
   tasks?: { [name: string]: MarkScript.Task }
@@ -21,8 +21,8 @@ export type TypeModel = s.KeyValue<s.reflective.Module>
 export interface BuildOptions extends MarkScript.Build {
   plugins: BuildModelPlugin<any, any>[]
   isTypeScript?: boolean
-  typeModel?: s.KeyValue<s.reflective.Module>
-  assetTypeModel?: s.KeyValue<s.reflective.Module>
+  buildTypeModel?: s.KeyValue<s.reflective.Module>
+  runtimeTypeModel?: s.KeyValue<s.reflective.Module>
   buildModelPersistance?: BuildModelPersistance
 }
 
@@ -82,18 +82,18 @@ export class Build {
         buildModel = deserialiseBuildModel(fs.readFileSync(persistedModelFileName).toString(), self.options.plugins)
         rebuildServer = true
       } else if (!buildModel || task.requiresFreshModel) {
-        let typeModel: s.KeyValue<s.reflective.Module> = self.options.typeModel
-        if (!typeModel && self.options.isTypeScript) {
+        let buildTypeModel: s.KeyValue<s.reflective.Module> = self.options.buildTypeModel
+        if (!buildTypeModel && self.options.isTypeScript) {
           let rawPackage = p.packageAstToFactory(self.options.pkgDir)
-          typeModel = rawPackage.construct(s.factoryToReflective())().modules
+          buildTypeModel = rawPackage.construct(s.factoryToReflective())().modules
         }
 
-        let assetTypeModel: s.KeyValue<s.reflective.Module> = self.options.typeModel
-        if (!assetTypeModel && self.options.isTypeScript) {
+        let runtimeTypeModel: s.KeyValue<s.reflective.Module> = self.options.buildTypeModel
+        if (!runtimeTypeModel && self.options.isTypeScript) {
           var rawPackage = p.packageAstToFactory(self.options.buildConfig.assetBaseDir ? path.join(self.options.pkgDir, self.options.buildConfig.assetBaseDir) : self.options.pkgDir);
-          assetTypeModel = rawPackage.construct(s.factoryToReflective())().modules
+          runtimeTypeModel = rawPackage.construct(s.factoryToReflective())().modules
         }
-        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, typeModel, assetTypeModel, buildDir)
+        buildModel = generateBuildModel(self.options.buildConfig, self.options.plugins, self.options.pkgDir, buildTypeModel, runtimeTypeModel, buildDir)
 
         if (persistsModel) {
           fs.writeFileSync(persistedModelFileName, serialiseBuildModel(buildModel, self.options.plugins, self.options.buildModelPersistance))

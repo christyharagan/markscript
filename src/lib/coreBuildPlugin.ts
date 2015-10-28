@@ -8,7 +8,7 @@ export const coreBuildPlugin:BuildModelPlugin<MarkScript.BuildConfig, MarkScript
     return buildModel
   },
 
-  jsonify: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?:string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any {
+  jsonify: function(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig, pkgDir?:string, buildTypeModel?: s.KeyValue<s.reflective.Module>, runtimeTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any {
     let serialisable: any = {
       databases: buildModel.databases,
       servers: buildModel.servers,

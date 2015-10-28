@@ -5,7 +5,7 @@ export declare const enum BuildModelPersistance {
     ALL = 2,
 }
 export interface BuildModelPlugin<C, M> {
-    generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildDir?: string): MarkScript.BuildModel & M;
+    generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, buildTypeModel?: s.KeyValue<s.reflective.Module>, runtimeTypeModel?: s.KeyValue<s.reflective.Module>, buildDir?: string): MarkScript.BuildModel & M;
     jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any;
     dejsonify?(jsonifiedModel: any): M;
     tasks?: {
@@ -16,8 +16,8 @@ export declare type TypeModel = s.KeyValue<s.reflective.Module>;
 export interface BuildOptions extends MarkScript.Build {
     plugins: BuildModelPlugin<any, any>[];
     isTypeScript?: boolean;
-    typeModel?: s.KeyValue<s.reflective.Module>;
-    assetTypeModel?: s.KeyValue<s.reflective.Module>;
+    buildTypeModel?: s.KeyValue<s.reflective.Module>;
+    runtimeTypeModel?: s.KeyValue<s.reflective.Module>;
     buildModelPersistance?: BuildModelPersistance;
 }
 export declare class Build {
