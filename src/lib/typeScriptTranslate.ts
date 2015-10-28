@@ -2,19 +2,11 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as ts from 'typescript'
 
-export function cleanAndTranslateTypeScript(code:{[relFiles:string]:string}, tmpDir:string, outDir:string) {
-  let relFiles = Object.keys(code).map(function(relFile){
-    fs.writeFileSync(path.join(tmpDir, relFile), removeDecorators(code[relFile]))
-    return relFile
-  })
-  let allCode:{ [relPath: string]: string } = {}
-  translateTypeScript(tmpDir, relFiles, outDir).forEach(function(code, i){
-    allCode[relFiles[i]] = code
-  })
-  return allCode
-}
+export function translateTypeScript(baseDir: string, relFiles:string[], tmpDir:string, outDir:string) {
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir)
+  }
 
-export function translateTypeScript(baseDir: string, relFiles:string[], outDir:string) {
   let compiledCode:{[relFiles:string]:string} = {}
 
   let options: ts.CompilerOptions = {
@@ -28,8 +20,7 @@ export function translateTypeScript(baseDir: string, relFiles:string[], outDir:s
   let jsRelFiles = []
   let compile = false
   let files = relFiles.map(function(relFile){
-    let tsFile = path.join(baseDir, relFile)
-    if (tsFile.substring(tsFile.length - 5) !== '.d.ts') {
+    if (relFile.substring(tsFile.length - 5) !== '.d.ts') {
       let jsRelFile = relFile.substring(0, relFile.length - 3) + '.js'
       let jsFile = path.join(outDir, jsRelFile)
 
@@ -38,9 +29,16 @@ export function translateTypeScript(baseDir: string, relFiles:string[], outDir:s
       if (!fs.existsSync(jsFile) || fs.statSync(tsFile).mtime >= fs.statSync(jsFile).mtime) {
         compile = true
       }
-    }
 
-    return tsFile
+      let file = path.join(tmpDir, relFile)
+      if (!fs.existsSync(path.dirname(file))) {
+        fs.mkdirSync(path.dirname(file))
+      }
+      fs.writeFileSync(file, removeDecorators(code[relFile]))
+      return file
+    } else {
+      return path.join(baseDir, relFile)
+    }
   })
 
   if (compile) {
