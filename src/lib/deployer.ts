@@ -308,8 +308,7 @@ function select() {
 }
 exports.select = select;`
 
-let rfpCode = `
-function resolve(value) {
+let rfpCode = `function resolve(value) {
     return new BasicPromise(value);
 }
 exports.resolve = resolve;
@@ -401,10 +400,27 @@ var BasicPromise = (function () {
         this.error = error;
     }
     BasicPromise.prototype.then = function (onfulfilled, onrejected) {
+        return this._then(onfulfilled, onrejected, true);
+    };
+    BasicPromise.prototype._then = function (onfulfilled, onrejected, convertArrays) {
         try {
             if (this.value !== undefined) {
                 if (onfulfilled) {
-                    var ret = onfulfilled(this.value);
+                    var value = this.value;
+                    if (convertArrays && value instanceof ValueIterator) {
+                        value = value.toArray().map(function (obj) {
+                            if (obj.root && obj.root.toObject) {
+                                return obj.root.toObject();
+                            }
+                            else if (obj.toObject) {
+                                return obj.toObject();
+                            }
+                            else {
+                                return obj;
+                            }
+                        });
+                    }
+                    var ret = onfulfilled(value);
                     if (ret && ret.then) {
                         return ret;
                     }
