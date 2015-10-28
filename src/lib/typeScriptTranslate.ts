@@ -6,6 +6,9 @@ export function translateTypeScript(baseDir: string, relFiles:string[], outDir:s
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir)
   }
+  if (tmpDir && !fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir)
+  }
 
   let compiledCode:{[relFiles:string]:string} = {}
 
@@ -13,7 +16,7 @@ export function translateTypeScript(baseDir: string, relFiles:string[], outDir:s
     module: ts.ModuleKind.CommonJS,
     target: ts.ScriptTarget.ES5,
     moduleResolution: ts.ModuleResolutionKind.Classic,
-    rootDir: process.cwd(),
+    rootDir: baseDir,
     outDir: outDir
   }
 
@@ -56,10 +59,14 @@ export function translateTypeScript(baseDir: string, relFiles:string[], outDir:s
     })
   }
 
-  return jsRelFiles.map(function(jsRelFile){
+  let code:{[relFile:string]:string} = {}
+
+  jsRelFiles.forEach(function(jsRelFile){
     let jsPath = path.join(outDir, jsRelFile)
-    return fs.readFileSync(jsPath).toString()
+    code[jsRelFile] = fs.readFileSync(jsPath).toString()
   })
+
+  return code
 }
 
 function removeDecorators(source: string): string {
