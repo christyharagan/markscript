@@ -5,7 +5,7 @@ export declare const enum BuildModelPersistance {
     ALL = 2,
 }
 export interface BuildModelPlugin<C, M> {
-    generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>): MarkScript.BuildModel & M;
+    generate?(buildModel: MarkScript.BuildModel, buildConfig: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildDir?: string): MarkScript.BuildModel & M;
     jsonify?(buildModel: M, buildConfig?: MarkScript.BuildConfig & C, pkgDir?: string, typeModel?: s.KeyValue<s.reflective.Module>, assetTypeModel?: s.KeyValue<s.reflective.Module>, buildModelPersistance?: BuildModelPersistance): any;
     dejsonify?(jsonifiedModel: any): M;
     tasks?: {

@@ -33,6 +33,7 @@
         "src/lib/deployer.ts",
         "src/lib/index.ts",
         "src/lib/modelVisitor.ts",
+        "src/lib/typeScriptTranslate.ts",
         "src/test/admin/alert/installAndDeleteAlert.ts",
         "src/test/createTestClient.ts",
         "typings/mocha/mocha.d.ts",
