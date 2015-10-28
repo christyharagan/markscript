@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as ts from 'typescript'
 
-export function translateTypeScript(baseDir: string, relFiles:string[], tmpDir:string, outDir:string) {
+export function translateTypeScript(baseDir: string, relFiles:string[], outDir:string, tmpDir?:string) {
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir)
   }
@@ -20,9 +20,10 @@ export function translateTypeScript(baseDir: string, relFiles:string[], tmpDir:s
   let jsRelFiles = []
   let compile = false
   let files = relFiles.map(function(relFile){
-    if (relFile.substring(tsFile.length - 5) !== '.d.ts') {
+    if (relFile.substring(relFile.length - 5) !== '.d.ts') {
       let jsRelFile = relFile.substring(0, relFile.length - 3) + '.js'
       let jsFile = path.join(outDir, jsRelFile)
+      let tsFile = path.join(baseDir, relFile)
 
       jsRelFiles.push(jsRelFile)
 
@@ -30,12 +31,16 @@ export function translateTypeScript(baseDir: string, relFiles:string[], tmpDir:s
         compile = true
       }
 
-      let file = path.join(tmpDir, relFile)
-      if (!fs.existsSync(path.dirname(file))) {
-        fs.mkdirSync(path.dirname(file))
+      if (tmpDir) {
+        let file = path.join(tmpDir, relFile)
+        if (!fs.existsSync(path.dirname(file))) {
+          fs.mkdirSync(path.dirname(file))
+        }
+        fs.writeFileSync(file, removeDecorators(fs.readFileSync(tsFile).toString()))
+        return file
+      } else {
+        return path.join(baseDir, relFile)
       }
-      fs.writeFileSync(file, removeDecorators(code[relFile]))
-      return file
     } else {
       return path.join(baseDir, relFile)
     }
